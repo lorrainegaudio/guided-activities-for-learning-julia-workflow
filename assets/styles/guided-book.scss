@@ -1,0 +1,592 @@
+/*-- scss:defaults --*/
+
+/* Boise State / course colors */
+
+$boise-blue: #0033A0;
+$boise-orange: #D64309;
+$boise-gray: #535455;
+
+$text-dark: #333333;
+$white: #ffffff;
+$soft-blue: #eef3ff;
+$soft-orange: #fff7f2;
+$soft-gray: #f8fafc;
+$code-gray: #f4f6f8;
+$border-gray: #d9dde4;
+
+/* Bootstrap / Quarto theme variables */
+
+$primary: $boise-blue;
+$secondary: $boise-orange;
+
+$body-bg: $white;
+$body-color: $text-dark;
+$link-color: $boise-orange;
+
+$font-size-root: 18px;
+$line-height-base: 1.65;
+
+$font-family-base: Garamond, Georgia, "Times New Roman", serif;
+$headings-font-family: "Gotham", Arial, Helvetica, sans-serif;
+$font-family-monospace: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+
+$headings-color: $boise-blue;
+
+
+/*-- scss:rules --*/
+
+/* =========================================================
+   Base page layout
+   ========================================================= */
+
+body {
+  color: $text-dark;
+  text-align: left;
+}
+
+main.content {
+  max-width: 1120px;
+}
+
+/* Use more of the browser width without making prose unreadably wide. */
+
+main.content p,
+main.content li,
+main.content dl,
+main.content blockquote {
+  max-width: none;
+}
+
+p {
+  margin-bottom: 1rem;
+}
+
+ul,
+ol {
+  margin-bottom: 1.1rem;
+}
+
+strong {
+  font-weight: 700;
+}
+
+/* =========================================================
+   Title block and headings
+   ========================================================= */
+
+.quarto-title-block {
+  margin-bottom: 1.5rem;
+}
+
+h1.title {
+  color: $boise-blue;
+  border-bottom: 5px solid $boise-orange;
+  padding-bottom: 0.45rem;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: $boise-gray;
+  font-size: 1.1rem;
+  margin-bottom: 1.4rem;
+}
+
+.chapter-subtitle {
+  color: $boise-gray;
+  font-size: 1.1rem;
+  margin-top: -0.4rem;
+  margin-bottom: 1.75rem;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  color: $boise-blue;
+  line-height: 1.2;
+}
+
+h1:not(.title) {
+  margin-top: 2.2rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 3px solid rgba(214, 67, 9, 0.22);
+}
+
+h2 {
+  margin-top: 1.9rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid $border-gray;
+}
+
+h3 {
+  margin-top: 1.4rem;
+}
+
+
+/* =========================================================
+   Links
+   ========================================================= */
+
+a {
+  color: $boise-orange;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+a:hover,
+a:focus {
+  color: $boise-blue;
+  text-decoration: underline;
+}
+
+
+/* =========================================================
+   Sidebar and page table of contents
+   ========================================================= */
+
+.sidebar-title {
+  color: $boise-blue;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.sidebar-item-text {
+  line-height: 1.35;
+}
+
+.sidebar-item-container .active,
+.sidebar-item-container a:hover {
+  color: $boise-orange;
+  font-weight: 700;
+}
+
+#TOC {
+  font-size: 0.95rem;
+}
+
+#TOC .active {
+  color: $boise-blue;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   Home page
+   ========================================================= */
+
+.book-home {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 1.25rem 2.5rem;
+}
+
+.book-home p,
+.book-home li {
+  max-width: none;
+}
+
+.home-banner-strip {
+  display: block;
+  width: 100%;
+  max-width: 1040px;
+  height: auto;
+  margin: 0.5rem auto 2rem;
+  border-radius: 0.6rem;
+  border: 1px solid $border-gray;
+  box-shadow: 0 6px 18px rgba(0, 51, 160, 0.08);
+}
+
+.home-intro-card {
+  background: $soft-gray;
+  border-left: 8px solid $boise-blue;
+  border-radius: 0.65rem;
+  padding: 1.2rem 1.4rem;
+  margin: 1.25rem 0 2rem;
+}
+
+.home-intro-card h2 {
+  margin-top: 0;
+  color: $boise-blue;
+  border-bottom: 1px solid $border-gray;
+  padding-bottom: 0.35rem;
+}
+
+.home-intro-card p,
+.home-intro-card li {
+  max-width: none;
+}
+
+.home-intro-card p:last-child {
+  margin-bottom: 0;
+}
+
+.home-button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  margin: 1.5rem 0 0;
+}
+
+.home-button-row a {
+  font-family: $headings-font-family;
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.1rem;
+}
+
+.home-button-primary {
+  background: $boise-blue;
+  color: $white !important;
+  border: 2px solid $boise-blue;
+}
+
+.home-button-primary:hover,
+.home-button-primary:focus {
+  background: #00257a;
+  border-color: #00257a;
+  color: $white !important;
+  text-decoration: none;
+}
+
+.home-button-secondary {
+  background: $white;
+  color: $boise-blue !important;
+  border: 2px solid $boise-blue;
+}
+
+.home-button-secondary:hover,
+.home-button-secondary:focus {
+  background: $soft-blue;
+  color: $boise-blue !important;
+  text-decoration: none;
+}
+
+
+/* =========================================================
+   Section landing pages
+   ========================================================= */
+
+.section-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0 2rem;
+}
+
+.section-card {
+  background: $white;
+  border: 1px solid $border-gray;
+  border-left: 8px solid $boise-blue;
+  border-radius: 0.65rem;
+  padding: 1rem 1.1rem;
+  box-shadow: 0 4px 12px rgba(0, 51, 160, 0.06);
+}
+
+.section-card h3 {
+  margin-top: 0;
+  color: $boise-blue;
+}
+
+.section-card p,
+.section-card li {
+  max-width: none;
+}
+
+.section-button {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.55rem 0.85rem;
+  border-radius: 0.45rem;
+  background: $boise-blue;
+  color: $white !important;
+  font-family: $headings-font-family;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.section-button:hover,
+.section-button:focus {
+  background: $boise-orange;
+  color: $white !important;
+  text-decoration: none;
+}
+
+
+/* =========================================================
+   Code and output
+   ========================================================= */
+
+code {
+  color: #1f2933;
+  background-color: $code-gray;
+  border-radius: 0.2rem;
+  padding: 0.1rem 0.25rem;
+  font-size: 0.95em;
+}
+
+pre,
+code {
+  font-family: $font-family-monospace;
+}
+
+pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+div.sourceCode {
+  border: 1px solid $border-gray;
+  border-left: 5px solid $boise-blue;
+  border-radius: 0.35rem;
+  background-color: $soft-gray;
+  margin: 1rem 0 1.25rem;
+  max-width: 100%;
+}
+
+div.sourceCode pre {
+  padding: 1rem;
+}
+
+.code-copy-button {
+  color: $boise-blue;
+}
+
+/* Make comments in code easier to read. */
+
+pre.sourceCode code span.co,
+code.sourceCode span.co,
+pre code span.co,
+pre code .hljs-comment,
+pre code .c,
+pre code .c1,
+pre code .cm,
+pre code span.comment {
+  color: #333333 !important;
+  font-style: italic;
+}
+
+
+/* =========================================================
+   Figures, screenshots, and captions
+   ========================================================= */
+
+figure {
+  margin: 1.5rem auto;
+  max-width: 100%;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+figcaption,
+.figure-caption {
+  color: $boise-gray;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+
+/* =========================================================
+   Tables
+   ========================================================= */
+
+table {
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+  max-width: 100%;
+}
+
+thead {
+  border-bottom: 2px solid $boise-blue;
+}
+
+th {
+  color: $boise-blue;
+}
+
+
+/* =========================================================
+   Callouts and instructional emphasis
+   ========================================================= */
+
+.callout {
+  border-radius: 0.45rem;
+  margin: 1.25rem 0;
+}
+
+.callout p,
+.callout li {
+  max-width: none;
+}
+
+.callout-note {
+  border-left-color: $boise-blue;
+}
+
+.callout-tip {
+  border-left-color: $boise-orange;
+}
+
+.callout-warning,
+.callout-caution {
+  border-left-color: $boise-orange;
+}
+
+.home-note,
+.course-note {
+  background: $soft-orange;
+  border-left: 6px solid $boise-orange;
+  border-radius: 0.45rem;
+  padding: 1rem 1.1rem;
+  margin: 1.25rem 0 1.75rem;
+}
+
+.course-note p,
+.home-note p {
+  max-width: none;
+}
+
+
+/* =========================================================
+   End-of-chapter sections
+   ========================================================= */
+
+#chapter-terms {
+  background: $soft-gray;
+  border-left: 6px solid $boise-blue;
+  border-radius: 0.45rem;
+  padding: 1rem 1.25rem;
+}
+
+#practice-space {
+  background: $soft-orange;
+  border: 2px solid $boise-orange;
+  border-radius: 0.55rem;
+  padding: 1rem 1.25rem;
+  margin-top: 2rem;
+}
+
+
+/* =========================================================
+   Dividers and footer
+   ========================================================= */
+
+hr {
+  border: 0;
+  border-top: 2px solid $border-gray;
+  margin: 2rem 0;
+}
+
+.nav-footer {
+  border-top: 1px solid $border-gray;
+  margin-top: 2rem;
+}
+
+
+/* =========================================================
+   Accessibility and responsive behavior
+   ========================================================= */
+
+:focus {
+  outline: 3px solid $boise-orange;
+  outline-offset: 2px;
+}
+
+@media (max-width: 991.98px) {
+  main.content {
+    max-width: 100%;
+  }
+
+  .book-home {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  main.content p,
+  main.content li,
+  .book-home p,
+  .book-home li {
+    max-width: none;
+  }
+
+  .home-banner-strip {
+    margin-top: 0.25rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  $mobile-padding: 0.9rem;
+
+  .home-intro-card,
+  .section-card,
+  .course-note,
+  .home-note {
+    padding: $mobile-padding;
+  }
+
+  .home-button-row {
+    flex-direction: column;
+  }
+
+  .home-button-row a {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* =========================================================
+   Glossary terms and popovers
+   ========================================================= */
+
+.glossary-term {
+  color: $boise-blue;
+  font-weight: 700;
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+  cursor: help;
+}
+
+.glossary-term:hover,
+.glossary-term:focus {
+  color: $boise-orange;
+  text-decoration-style: solid;
+  outline: none;
+}
+
+.glossary-term:focus {
+  box-shadow: 0 0 0 0.18rem rgba(0, 51, 160, 0.18);
+  border-radius: 0.2rem;
+}
+
+.glossary-term-missing {
+  color: $boise-orange;
+  text-decoration-style: wavy;
+}
+
+.popover.glossary-popover {
+  max-width: 390px;
+  border: 1px solid $boise-blue;
+  border-radius: 0.5rem;
+  box-shadow: 0 6px 18px rgba(0, 51, 160, 0.14);
+  font-family: $font-family-base;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.popover.glossary-popover .popover-header {
+  background: $soft-blue;
+  color: $boise-blue;
+  border-bottom: 1px solid $border-gray;
+  font-family: $headings-font-family;
+  font-weight: 700;
+}
+
+.popover.glossary-popover .popover-body {
+  color: $text-dark;
+  background: $white;
+}

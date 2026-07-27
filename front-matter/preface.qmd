@@ -1,0 +1,101 @@
+---
+title: "Preface"
+---
+
+## Why this book exists
+
+I began this book because I wanted to learn Julia for research, especially for computational modeling and agent-based modeling. I already knew how to work in R, RStudio, and Quarto. Because I am learning independently through openly available resources, I wanted a place to organize my notes, questions, examples, and developing understanding.
+
+Those uncertainties are part of the subject of this book. Learning a programming language involves more than learning its syntax. It also involves learning how a set of tools fit together: where files live, how code is executed, how packages are managed, how results are checked, and how a project can be reopened and understood later.
+
+This book records that learning process. It begins with Julia, Visual Studio Code, Quarto, and project-oriented workflow, then uses those foundations to approach agent-based modeling. The goal is to develop enough understanding to read, run, inspect, revise, and explain computational models—not merely to produce code that appears to work.
+
+## Why Julia?
+
+[Julia](https://julialang.org/) is a general-purpose programming language designed with technical and scientific computing in mind. It supports interactive exploration while also offering performance suited to computationally demanding work. Julia's design emphasizes multiple dispatch: the behavior of a function can depend on the types of all its relevant inputs. This makes it possible to build specialized parts that still work together through shared abstractions.
+
+Those characteristics make Julia especially interesting for modeling. An agent-based model may contain many interacting entities, rules, states, and repeated computations. Julia provides a language in which those components can be expressed at a relatively high level while still supporting efficient execution as a model grows.
+
+The choice of Julia in this practicum is practical. It is relevant to the modeling work I want to understand with my advisor, and it creates an opportunity to study how computational models are organized rather than treating a finished model as a black box. This book does not assume that Julia is the best language for every task. It asks a narrower question: what becomes possible when I learn Julia well enough to understand and adapt models for my own research?
+
+## Why Visual Studio Code?
+
+[Visual Studio Code](https://code.visualstudio.com/) is the application in which we will read and edit most of the files in this book. At its core, it is a code editor organized around files and folders. It can be extended with additional tools for particular languages and workflows.
+
+VS Code, Julia, and the Julia extension have different jobs:
+
+- **VS Code** provides the editor and interface.
+- **Julia** is the programming language and the runtime that executes Julia code.
+- **The Julia extension** connects Julia-specific capabilities to VS Code, including syntax highlighting, code completion, documentation, and an integrated Julia REPL.
+- **The terminal** provides a command-line interface to the computer. It can launch Julia, Quarto, Git, and other programs, but it is not itself Julia.
+- **The Julia REPL** is an interactive Julia session. REPL stands for *read–evaluate–print loop*: it reads an expression, evaluates it with Julia, prints the result, and waits for the next expression.
+
+Installing VS Code does not install Julia. Installing Julia does not automatically give VS Code Julia-specific features. The extension connects the two, but the Julia runtime still performs the computation. Keeping these roles separate makes it easier to diagnose problems and to identify where code actually ran.
+
+## One folder, several kinds of project
+
+VS Code is file- and folder-based. Opening a folder makes it the current single-folder **workspace**: its contents appear in the Explorer, new integrated terminals usually open in that context, and VS Code can apply settings associated with that folder.
+
+That workspace may contain several other kinds of project structure:
+
+- A **Quarto project** is organized by a `_quarto.yml` configuration file. In a Quarto book, that file identifies chapters and controls how the manuscript is rendered.
+- A **Julia project environment** is described by `Project.toml` and, when present, `Manifest.toml`. These files record the packages and versions needed by the Julia project.
+- A **Git repository** is a folder whose changes and history are tracked by Git.
+- A **VS Code workspace** is the folder—or collection of folders—currently opened in VS Code.
+
+These structures can refer to the same folder without meaning the same thing. The folder is the container. Quarto organizes the book, Julia manages the computational environment, Git records changes, and VS Code provides a view into the work.
+
+## If you already know R and RStudio
+
+Experience with R provides a useful bridge into this workflow, although it is not required to use the book.
+
+| Familiar idea | In an R/RStudio workflow | In this Julia/VS Code workflow |
+|---|---|---|
+| Programming language | R | Julia |
+| Interactive language session | R console | Julia REPL |
+| Standalone script | `.R` file | `.jl` file |
+| Editor | RStudio | VS Code with the Julia extension |
+| Project context | Often an `.Rproj` file | An opened VS Code folder, with a Julia environment defined separately |
+| Reproducible document | Quarto `.qmd` file | Quarto `.qmd` file |
+
+The last row is an important point of continuity: Quarto is not limited to R. It can combine prose, code, results, figures, and citations in a reproducible document while using Julia as the computational language.
+
+The comparisons also have limits. VS Code is more modular than RStudio, so language support is added through extensions. Julia environments are not the same as RStudio projects. A familiar label such as *console*, *project*, or *environment* may refer to a slightly different relationship among tools. Throughout the book, comparisons to R will be used when they clarify a concept, and the Julia workflow will also be explained on its own terms.
+
+## Why begin in Quarto and still learn Julia scripts?
+
+We begin writing in Quarto because the book is both a learning resource and a record of inquiry. A `.qmd` file can place an explanation beside the code, output, interpretation, and questions that produced it. This makes the reasoning available to a future reader—including my future self.
+
+We will also use standalone `.jl` scripts. A Quarto document and a Julia script serve related purposes, but they are not interchangeable. The document explains and communicates an analysis; the script provides a direct place to develop and run a program. Learning both will help us distinguish the model from the document that describes the model.
+
+The working rhythm of this book is:
+
+1. **State the goal.** What are we trying to understand or make happen?
+2. **Inspect the code.** What does each meaningful part appear to do?
+3. **Run it deliberately.** Where will it execute, and in which environment?
+4. **Verify the result.** What observable evidence shows that it worked?
+5. **Revise and explain.** What changed, why did it change, and what remains uncertain?
+
+This rhythm matters when working with AI assistance. An AI tool can draft or modify code quickly, but speed does not establish that the code is correct, appropriate, or understood. The learner remains responsible for examining assumptions, testing outputs, documenting assistance, and deciding whether the result is adequate for the research purpose.
+
+## Who this book is for
+
+This book is written first for my own learning and for conversations with my advisor. It may also be useful to researchers or students who want an approachable path into Julia, VS Code, Quarto, and agent-based modeling. Maybe I will turn it into something more later and so I am designing my notes in a way that might be useful beyond the original purpose.
+
+Readers who know R may use the comparisons as landmarks. Readers who do not know R can ignore them; every essential concept will be introduced directly. No prior experience with Julia is assumed. The book does assume a willingness to pause over the workflow—to ask where code is running, what a file controls, how a result was produced, and what evidence would justify trusting it.
+
+That attention to workflow is not separate from learning to model. A computational model is a system of choices made executable. Understanding those choices requires us to understand the language, tools, files, and environments through which the model becomes observable.
+
+## Chapter Terms
+
+**Julia**: A programming language designed for scientific computing, data analysis, modeling, and other computational work. Julia combines readable, high-level code with performance suited to computationally demanding tasks.
+
+**Visual Studio Code (VS Code)**: A general-purpose code editor that can be extended to support different programming languages and workflows. In this book, VS Code provides the interface for writing files, navigating folders, running Julia, using the terminal, and working with Quarto.
+
+**Workspace**: The folder or collection of folders currently open in VS Code. The workspace establishes the working context by determining which files appear in the Explorer and where project-specific settings and terminal sessions are associated.
+
+**Quarto**: An open-source publishing system for creating reproducible documents, websites, presentations, and books from plain-text source files. Quarto documents use the .qmd file extension and can combine explanatory writing with executable code.
+
+**Repository**: A project folder tracked by Git, including its files and the recorded history of changes to them. A local repository can be connected to GitHub so that the project can be backed up, shared, and published online.
+
+**Julia REPL**: Julia’s interactive Read–Eval–Print Loop, where Julia reads an expression, evaluates it, prints the result, and waits for the next instruction. It is useful for testing code and exploring Julia interactively.

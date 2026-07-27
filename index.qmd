@@ -1,0 +1,64 @@
+---
+toc: false
+page-layout: full
+---
+
+::: {.book-home}
+
+# Welcome {.unnumbered}
+
+::: {.home-intro-card}
+
+## Guided activities for learning Julia workflow
+
+This book contains guided activities for learning Julia workflow. These activities help you move between reading instructions, writing code in Visual Studio Code, checking what happened, and reflecting on what you are learning.
+
+You are not expected to know this before you begin. The goal is not perfect code on the first try. The goal is to build a reliable workflow for noticing, checking, and improving your work.
+
+:::
+
+## What this book is
+
+This book is an evolving collection of guided Julia activities. Each chapter introduces workflow concepts, models how the tools work together, gives you code or configuration to examine and run, and prompts you to document what you are learning.
+
+The guided activities are instructional support for learning Julia, VS Code, Quarto, Git, and eventually a basic agent-based modeling workflow.
+
+## Current scope
+
+This prototype contains the preface and a first foundations activity. Julia code execution will be added after the Julia runtime and VS Code extension have been installed and verified. A full Julia curriculum and agent-based modeling chapter remain later work.
+
+## How to use this book
+
+Keep this book open next to VS Code.
+
+Use each activity to:
+
+- identify the goal,
+- read and type the meaningful code or configuration,
+- check what happened,
+- write down what worked,
+- notice what confused you,
+- and reflect on what to try next.
+
+## When something does not work
+
+Confusion is not a sign that you are failing. It is information you can use to decide what to check next.
+
+When code or configuration does not work, slow down and ask:
+
+- What was my goal?
+- What did I type or change?
+- What happened?
+- What did I expect to happen?
+- What can I check next?
+
+## Start here
+
+Begin with the **Preface**, then move into **Foundations** and the first guided activity, **Navigate VS Code and Julia**.
+
+<div class="home-button-row">
+<a class="home-button-primary" href="front-matter/preface.html">Start with the Preface</a>
+<a class="home-button-secondary" href="chapters/01-foundations/navigation.html">Open the first activity</a>
+</div>
+
+:::

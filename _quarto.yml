@@ -1,0 +1,46 @@
+project:
+  type: book
+  output-dir: _book
+
+book:
+  title: "Introduction to Julia Programming: Goal, Code, Verify, Reflect"
+  subtitle: "Guided Activities for Learning Julia Workflow"
+  author: "Lorraine Gaudio"
+  date: today
+  site-url: "https://lorrainegaudio.github.io/guided-activities-for-learning-julia-workflow/"
+  repo-url: "https://github.com/lorrainegaudio/guided-activities-for-learning-julia-workflow"
+  search: true
+  page-navigation: true
+  sidebar:
+    style: docked
+    collapse-level: 1
+  page-footer:
+    left: "Goal, Code, Verify, Reflect"
+    right: "Boise State University"
+  chapters:
+    - index.qmd
+    - front-matter/preface.qmd
+    - part: chapters/01-foundations/foundations.qmd
+      chapters:
+        - chapters/01-foundations/navigation.qmd
+
+format:
+  html:
+    theme:
+      - cosmo
+      - assets/styles/guided-book.scss
+    toc: false
+    toc-depth: 3
+    toc-title: "On this page"
+    toc-expand: true
+    anchor-sections: true
+    number-sections: false
+    code-copy: true
+    code-overflow: wrap
+    smooth-scroll: true
+    link-external-newwindow: true
+
+execute:
+  freeze: auto
+
+lang: en

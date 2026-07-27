@@ -1,0 +1,21 @@
+---
+title: "Foundations"
+---
+
+<p class="chapter-subtitle">VS Code, folders, Quarto, Git, and Julia</p>
+
+The foundations section establishes the working environment before executable Julia lessons begin. Its purpose is to help you see which tool is doing what and how the pieces connect.
+
+::: {.section-card-grid}
+
+::: {.section-card}
+
+### Navigate VS Code and Julia
+
+Distinguish the folder, VS Code workspace, Quarto project, local Git repository, remote GitHub repository, Julia runtime, and rendered HTML book.
+
+[Open the activity](navigation.qmd){.section-button}
+
+:::
+
+:::
