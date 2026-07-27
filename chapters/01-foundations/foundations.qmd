@@ -10,11 +10,21 @@ The foundations section establishes the working environment before executable Ju
 
 ::: {.section-card}
 
-### Navigate VS Code and Julia
+### Navigate VS Code and GitHub
 
-Distinguish the folder, VS Code workspace, Quarto project, local Git repository, remote GitHub repository, Julia runtime, and rendered HTML book.
+Distinguish the folder, VS Code workspace, Quarto project, local Git repository, remote GitHub repository, and rendered HTML book.
 
 [Open the activity](navigation.qmd){.section-button}
+
+:::
+
+::: {.section-card}
+
+### Setup Julia on VS Code
+
+Distinguish Julia runtime, and rendered HTML book.
+
+[Open the activity](julia-setup.qmd){.section-button}
 
 :::
 

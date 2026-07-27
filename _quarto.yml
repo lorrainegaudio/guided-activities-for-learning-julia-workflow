@@ -23,6 +23,7 @@ book:
     - part: chapters/01-foundations/foundations.qmd
       chapters:
         - chapters/01-foundations/navigation.qmd
+        - chapters/01-foundations/julia-setup.qmd
 
 format:
   html:

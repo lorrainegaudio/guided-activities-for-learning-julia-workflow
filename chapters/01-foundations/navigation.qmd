@@ -17,11 +17,7 @@ By the end of this chapter, you will be able to:
 3. Locate and use the Explorer, editor, editor tabs, Activity Bar, Command Palette, Extensions view, integrated terminal, and status bar.
 4. Create, name, open, edit, and save a Quarto (`.qmd`) file in the intended project folder.
 5. Configure word wrap and autosave so that prose is comfortable to read and edit.
-6. Switch between Quarto’s source editor and visual editor and explain when each view is useful.
-7. Distinguish VS Code, Quarto, the Julia runtime, the Julia extension, the terminal, and the Julia REPL.
-8. Install Julia and the necessary VS Code extensions and verify that they are working together.
-9. Add and execute a simple Julia code chunk inside a Quarto document and identify where the code ran.
-10. Preview or render a Quarto document and distinguish among saving a source file, rendering output, committing changes, and pushing those changes to GitHub.
+6. Preview a Quarto project, stop the live preview process, and distinguish among saving source files, rendering output, committing changes, and pushing changes to GitHub.
 
 ## Understand where the project lives
 
@@ -402,7 +398,7 @@ Saving, committing, and pushing also performed different tasks. Saving wrote the
 
 ## Summary
 
-
+In this chapter, you established the working structure for a Quarto and Julia project before beginning to write Julia code. You created a remote repository on GitHub, cloned it onto your computer, and learned how the same project folder functions as a local Git repository, VS Code workspace, and Quarto project. You navigated the main parts of the VS Code interface, created and saved a Quarto file, configured word wrap and autosave, previewed the rendered project, and stopped the active preview process. Finally, you staged, committed, and pushed your changes to GitHub. Together, these activities distinguish four easily confused actions: saving changes to local source files, rendering those files with Quarto, recording a version with Git, and sending that version to GitHub.
 
 ## Chapter terms
 
