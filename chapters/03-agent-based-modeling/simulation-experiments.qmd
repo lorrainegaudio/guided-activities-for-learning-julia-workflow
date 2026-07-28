@@ -1,0 +1,36 @@
+---
+title: "Simulation Experiments"
+subtitle: "From one model run to a small reproducible experiment"
+toc: true
+---
+
+This chapter treats simulation as an empirical activity requiring deliberate design, reproducibility, and bounded interpretation.
+
+## Planned learning outcomes
+
+By the end of this chapter, you will be able to:
+
+1. Initialize a fresh model instead of unknowingly continuing an earlier run.
+2. Use the model's random-number generator and record a seed.
+3. Run a model for a specified number of steps.
+4. Collect agent-level and model-level measurements.
+5. Recognize and inspect the resulting tabular data.
+6. Plot an adoption trajectory.
+7. Run multiple replications under the same parameter settings.
+8. Vary one parameter systematically and compare the resulting distributions.
+9. Distinguish a single illustrative trajectory from evidence about typical model behavior.
+10. Explain how stochastic variation affects interpretation.
+11. Document the model's mechanisms, assumptions, outputs, and limitations.
+12. Make one principled modification and predict its consequences before running it.
+
+## Planned scope
+
+The experiment will compare repeated adoption trajectories across a small, predefined set of adoption-probability values. It will not introduce parallel computing, optimization, calibration to empirical data, or a network-based model.
+
+## Culminating activity
+
+The learner will design a small parameter comparison, run replications, create a plot or concise summary, interpret the stochastic results, and explain what the experiment cannot establish.
+
+## Development note
+
+This file is a planning stub for the complete guided chapter. O1 may revise the outcomes, experiment design, and lesson sequence while preserving the module's purpose.

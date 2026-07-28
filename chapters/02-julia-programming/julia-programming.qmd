@@ -1,0 +1,31 @@
+---
+title: "Julia Programming"
+---
+
+<p class="chapter-subtitle">Reading code and expressing rules, state, and change</p>
+
+The Julia Programming module develops the language skills needed to understand a small simulation. It begins with reading Julia values, expressions, collections, and notation. It then uses functions, decisions, repetition, randomness, and mutation to express how a simple population changes over time.
+
+::: {.section-card-grid}
+
+::: {.section-card}
+
+### Julia Literacy
+
+Read short Julia programs, interpret common values and collections, and recognize the notation that will reappear in the simulation chapters.
+
+[Open the activity](julia-literacy.qmd){.section-button}
+
+:::
+
+::: {.section-card}
+
+### Rules and State
+
+Use functions, conditions, loops, randomness, and mutation to turn a conceptual behavioral rule into a small vector-based simulation.
+
+[Open the activity](rules-and-state.qmd){.section-button}
+
+:::
+
+:::

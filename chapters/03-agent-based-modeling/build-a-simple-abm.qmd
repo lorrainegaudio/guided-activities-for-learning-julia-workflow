@@ -1,0 +1,36 @@
+---
+title: "Build a Simple Agent-Based Model"
+subtitle: "Translating a social-learning mechanism into Agents.jl"
+toc: true
+---
+
+This chapter reorganizes the understood vector-based simulation as a small model in Agents.jl.
+
+## Planned learning outcomes
+
+By the end of this chapter, you will be able to:
+
+1. Define agent-based modeling in terms of agents, state, rules, interaction, activation, time, and system-level outcomes.
+2. Activate a Julia project environment and load the packages required by the model.
+3. Explain how `Project.toml` and `Manifest.toml` support reproducibility.
+4. Read a small agent definition without mastering Julia's full type system.
+5. Distinguish agent properties from model-level parameters.
+6. Write an initialization function that constructs and populates a model.
+7. Write an `agent_step!` function that changes an agent's state.
+8. Create and advance a discrete-time model.
+9. Inspect the model and its agents.
+10. Explain the model code line by line and connect it to conceptual modeling decisions.
+
+## Planned scope
+
+Each agent will have one substantive property: whether it has adopted a practice. Agents will be well mixed. During activation, an agent will randomly observe another agent, and a non-adopter may copy an adopter according to a model parameter.
+
+The well-mixed interaction structure is an assumption, not a neutral default. A network-based interaction structure belongs to a later extension rather than this first model.
+
+## Culminating activity
+
+The learner will run the model for several steps, inspect how agent states change, and map the implemented components back to the earlier vector-based mechanism.
+
+## Development note
+
+This file is a planning stub for the complete guided chapter. O1 should verify all package-specific instructions against the current official Agents.jl documentation while drafting.

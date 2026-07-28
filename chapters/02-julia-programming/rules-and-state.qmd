@@ -1,0 +1,37 @@
+---
+title: "Rules and State"
+subtitle: "Functions, decisions, repetition, randomness, and changing state"
+toc: true
+---
+
+This chapter introduces the Julia structures needed to turn a conceptual behavioral rule into an executable mechanism.
+
+## Planned learning outcomes
+
+By the end of this chapter, you will be able to:
+
+1. Define and call a Julia function.
+2. Read multiline and abbreviated function definitions.
+3. Distinguish positional arguments from keyword arguments.
+4. Explain how a Julia function determines its returned value.
+5. Use `if`, `elseif`, and `else` to express a decision.
+6. Use a `for` loop to repeat an action.
+7. Combine comparisons and Boolean operators into a condition.
+8. Modify a mutable collection and interpret the `!` naming convention.
+9. Generate random values with an explicitly supplied random-number generator.
+10. Inspect a developing rule with `println`, `@show`, `typeof`, and small checks.
+11. Build and explain a miniature time-step simulation using Julia vectors and functions.
+
+## Planned scope
+
+The simulated population will be represented by a Boolean vector. `true` means that an individual has adopted a practice and `false` means that the individual has not. During each step, one individual observes another and may adopt. A loop repeats the rule and records the number of adopters.
+
+The chapter remains in ordinary Julia rather than Agents.jl. Its pedagogical purpose is to make the mechanism understandable before a framework organizes it.
+
+## Culminating activity
+
+The learner will predict the effect of a behavioral rule, run the vector-based simulation, inspect the adoption count over time, and explain which lines represent state, interaction, chance, and change.
+
+## Development note
+
+This file is a planning stub for the complete guided chapter. O1 may revise the outcomes, examples, and lesson sequence as the chapter develops.

@@ -1,0 +1,31 @@
+---
+title: "Agent-Based Modeling"
+---
+
+<p class="chapter-subtitle">Building a model and learning from simulation experiments</p>
+
+The Agent-Based Modeling module translates an understood social-learning mechanism into an explicit model. It first connects agents, state, rules, interaction, activation, and time to their implementation in Agents.jl. It then moves from a single model run to repeated, reproducible simulation experiments and bounded interpretation.
+
+::: {.section-card-grid}
+
+::: {.section-card}
+
+### Build a Simple Agent-Based Model
+
+Define agents and model properties, initialize a model, express an agent step, advance time, and connect each part of the program to an ABM concept.
+
+[Open the activity](build-a-simple-abm.qmd){.section-button}
+
+:::
+
+::: {.section-card}
+
+### Simulation Experiments
+
+Initialize fresh models, record randomness, collect results, compare repeated runs and parameter settings, and interpret the observed variation.
+
+[Open the activity](simulation-experiments.qmd){.section-button}
+
+:::
+
+:::

@@ -20,10 +20,21 @@ book:
   chapters:
     - index.qmd
     - front-matter/preface.qmd
+
     - part: chapters/01-foundations/foundations.qmd
       chapters:
         - chapters/01-foundations/navigation.qmd
         - chapters/01-foundations/julia-setup.qmd
+
+    - part: chapters/02-julia-programming/julia-programming.qmd
+      chapters:
+        - chapters/02-julia-programming/julia-literacy.qmd
+        - chapters/02-julia-programming/rules-and-state.qmd
+
+    - part: chapters/03-agent-based-modeling/agent-based-modeling.qmd
+      chapters:
+        - chapters/03-agent-based-modeling/build-a-simple-abm.qmd
+        - chapters/03-agent-based-modeling/simulation-experiments.qmd
 
 format:
   html:
