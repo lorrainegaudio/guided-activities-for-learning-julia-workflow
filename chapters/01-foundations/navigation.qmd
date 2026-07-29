@@ -1,42 +1,44 @@
 ---
 title: "Navigate VS Code and GitHub"
-subtitle: "Folders, projects, repositories, tools, and rendered output"
+subtitle: "Folders, project environments, and repositories"
 toc: true
 ---
 
-Learning Julia involves more than learning the Julia language. A project also has files, folders, software, and connections among tools. Before writing Julia code, it helps to understand where the project lives, how to open the correct folder, and how VS Code and Quarto interact with the files inside it.
+## Overview
 
-This chapter begins by creating that working environment. We will establish a GitHub repository, bring it onto the computer, navigate the VS Code interface, create a Quarto document, and preview the rendered result. Julia installation and code execution come later in the chapter.
+As part of the process of learning Julia programming, you need to understand a Julia project environment: where the project lives, how to open the correct folder, and how the tools surrounding Julia relate to the files inside that folder.
 
-## Learning outcomes
+This chapter establishes that working structure. We will create a GitHub repository, bring it onto the computer, open it in VS Code, navigate the VS Code interface, and create a Julia script. We will also introduce the Julia project environment so that the roles of `Project.toml` and `Manifest.toml` are clear before we begin installing packages. Julia installation and code execution come in the next chapter.
 
-By the end of this chapter, you will be able to:
+**After working through this chapter, you will be able to:**
 
-1. Explain the relationship among a GitHub repository, a local repository, a folder on your computer, and a VS Code workspace.
+1. Explain the relationship among a GitHub repository, a local repository, a folder on your computer, a VS Code workspace, and a Julia project environment.
 2. Create a repository on GitHub, clone it into a chosen location on your computer, and open the correct repository folder in VS Code.
-3. Locate and use the Explorer, editor, editor tabs, Activity Bar, Command Palette, Extensions view, integrated terminal, and status bar.
-4. Create, name, open, edit, and save a Quarto (`.qmd`) file in the intended project folder.
-5. Configure word wrap and autosave so that prose is comfortable to read and edit.
-6. Preview a Quarto project, stop the live preview process, and distinguish among saving source files, rendering output, committing changes, and pushing changes to GitHub.
+3. Locate and use the Explorer, editor, editor tabs, Activity Bar, Command Palette, Extensions view, integrated terminal, Source Control view, and status bar.
+4. Create, name, open, edit, and save a Julia script (`.jl`) in the intended project folder.
+5. Configure word wrap and autosave in VS Code.
+6. Recognize the files associated with a Julia project environment and distinguish among saving a file, running code, committing changes, and pushing changes to GitHub.
 
 ## Understand where the project lives
 
-**Goal:** Build a mental model of the relationship among the GitHub repository, the project folder, the local repository, and the VS Code workspace.
+**Goal:** Build a mental model of the relationship among the GitHub repository, the project folder, the local repository, the VS Code workspace, and the Julia project environment.
 
-A GitHub repository is the copy of the project stored on GitHub. It is often called the **remote repository** because it exists outside the computer where we are doing the immediate work.
+A [GitHub repository]{.glossary-term data-term="GitHub Repository"} is a copy of the project stored on GitHub. It is often called the **remote repository** because it exists outside the computer where we are doing the immediate work.
 
 To edit the project on a computer, we create a connected local copy by cloning the GitHub repository. Cloning creates a folder containing the project files. It also places Git information inside that folder so that Git can track changes and remember which GitHub repository the folder came from.
 
-The resulting folder has several related identities:
+The resulting folder can have several related roles:
 
 - It is a **folder** because it is a location in the computer’s file system.
-- It is a **local repository** because Git tracks the project inside it.
-- It becomes a **VS Code workspace** when that folder is opened in VS Code.
-- It becomes a **Quarto project** when it contains Quarto project files, including a configuration file such as `_quarto.yml`.
+- It is a [local repository]{.glossary-term data-term="Local Repository"} because Git tracks the project inside it.
+- It becomes a [VS Code workspace]{.glossary-term data-term="VS Code Workspace"} when that folder is opened in VS Code.
+- It becomes the root of a [Julia project environment]{.glossary-term data-term="Julia Project Environment"} when it contains a `Project.toml` file and, when present, a `Manifest.toml` file.
 
-These terms describe different features of the same working location. VS Code does not move the project somewhere else when it opens the folder. It provides an interface for working with the files where they are already stored.
+These descriptions can apply to the same folder without meaning the same thing. VS Code does not move the project when it opens the folder. It provides an interface for working with files where they are already stored. Git records changes to those files. Julia uses the environment files to determine which packages belong to the project.
 
-**Reflect:** The folder is the central point connecting these tools. Git tracks its history, VS Code provides an environment for editing it, and Quarto transforms its source files into a readable document or website. Opening the wrong folder can therefore affect several parts of the workflow at once. VS Code may display the wrong files, Git may track a different repository, and Quarto may render a different project.
+A new repository may not contain `Project.toml` or `Manifest.toml` yet. We will create the Julia environment after Julia is installed. For now, the important point is that the project folder will provide a shared location for the code, the Git history, the VS Code workspace, and the Julia environment.
+
+**Reflect:** The folder is the central point connecting these tools. Opening the wrong folder can affect several parts of the workflow at once: VS Code may display the wrong files, Git may track a different repository, and Julia may use a different project environment.
 
 ## Create a repository on GitHub
 
@@ -44,7 +46,7 @@ The project needs a remote home before it can be cloned onto the computer.
 
 **Goal:** Create a GitHub repository that will hold the remote version of the project.
 
-**Code:**
+**Tasks:**
 
 1. Sign in to GitHub.
 2. Select **New repository**.
@@ -63,7 +65,7 @@ GitHub may offer to initialize the repository with a README, a `.gitignore` file
 
 ## Clone the repository onto the computer
 
-Cloning is different from downloading an ordinary folder. It copies the project and preserves the Git connection between the local and remote repositories.
+[Cloning]{.glossary-term data-term="Clone"} is different from downloading an ordinary folder. It copies the project and preserves the Git connection between the local and remote repositories.
 
 **Goal:** Clone the GitHub repository into the folder where GitHub projects are stored on the computer.
 
@@ -81,12 +83,12 @@ The address will resemble:
 git@github.com:username/repository-name.git
 ```
 
-This is the repository’s SSH address. It tells Git which remote repository to contact. It is not an SSH private key. Private keys should never be copied into a project or shared with another person.
+This is the repository’s [SSH address]{.glossary-term data-term="SSH Address"}. It tells Git which remote repository to contact. It is not an SSH private key.
 
 Now move to VS Code.
 
 1. Open VS Code without opening another project folder.
-2. Select the **Source Control** icon in the Activity Bar. The icon resembles a branching path.
+2. Select the [Source Control]{.glossary-term data-term="Source Control"} icon in the Activity Bar. The icon resembles a branching path.
 3. Select **Clone Repository**.
 4. Paste the SSH address.
 5. Choose the parent folder where GitHub projects are stored.
@@ -122,20 +124,20 @@ An empty Explorer can still be correct when the repository itself is new and emp
 The local folder can also be renamed without renaming the GitHub repository. For example, a remote repository named:
 
 ```text
-guided-activities-for-learning-julia-workflow
+learning-julia-workflow
 ```
 
 can have a shorter local folder name:
 
 ```text
-OER_julia
+julia-intro
 ```
 
 Changing the local folder’s visible name does not change the remote address stored by Git.
 
 ## Recognize Workspace Trust
 
-VS Code may open an unfamiliar folder in **Restricted Mode**. Restricted Mode limits features that could execute code, including terminals, tasks, extensions, and some source-control functions.
+VS Code may open an unfamiliar folder in **Restricted Mode**. [Workspace Trust]{.glossary-term data-term="Workspace Trust"} limits features that could execute code, including terminals, tasks, extensions, and some source-control functions, until we decide that the folder is safe.
 
 This safety feature can make Git commands or the **Clone Repository** option appear to be missing.
 
@@ -155,25 +157,25 @@ VS Code should remember the decision for that folder. Workspace Trust does not n
 
 **Goal:** Identify the parts of VS Code used to navigate, edit, and manage the project.
 
-**Code:**
+**Explore:**
 
-The vertical strip along the far-left edge is the **Activity Bar**. Its icons open different views in the sidebar.
+The vertical strip along the far-left edge is the [Activity Bar]{.glossary-term data-term="Activity Bar"}. Its icons open different views in the sidebar.
 
-Select the **Explorer** icon. The Explorer displays the folders and files in the workspace. The name at the top indicates which folder VS Code currently has open.
+Select the [Explorer]{.glossary-term data-term="Explorer"} icon. The Explorer displays the folders and files in the workspace. The name at the top indicates which folder VS Code currently has open.
 
-Select a file in the Explorer. The file opens in the central **editor**. Opening another file creates another **editor tab** above the editor. These tabs make it possible to move among open files without changing their locations in the project.
+Select a file in the Explorer. The file opens in the central [editor]{.glossary-term data-term="Editor"}. You likely see a "Welcome" tab in this pane. Opening another file creates another [editor tab]{.glossary-term data-term="Editor Tab"} above the editor. These tabs make it possible to move among open files without changing their locations in the project.
 
 After changing a file, a dot may appear in its editor tab. The dot indicates that the editor contains changes that have not yet been saved.
 
 Select the **Source Control** icon. This view shows files that Git recognizes as changed.
 
-Select the **Extensions** icon. This view is where VS Code extensions are found and managed. Extensions add support for tools and languages, including Julia and Quarto.
+Select the **Extensions** icon. This view is where VS Code extensions are found and managed. Extensions add support for tools and programming languages, including Julia.
 
-Open the **Command Palette** by pressing **Command-Shift-P**. The Command Palette provides a searchable way to find commands without remembering where they appear in the menus. Press **Escape** to close it.
+Open the [Command Palette]{.glossary-term data-term="Command Palette"} by pressing **Command-Shift-P**. The Command Palette provides a searchable way to find commands without remembering where they appear in the menus. Press **Escape** to close it.
 
-Open the integrated terminal by selecting **Terminal → New Terminal**. The terminal appears in a panel inside VS Code and allows commands to be run without opening a separate Terminal application.
+Open the [integrated terminal]{.glossary-term data-term="Integrated Terminal"} by selecting **Terminal → New Terminal**. The terminal appears in a panel inside VS Code and allows commands to be run without opening a separate Terminal application.
 
-Finally, look along the bottom edge of the window. This is the **status bar**. The information shown there changes with the workspace and the active file. It may display the current Git branch, the language associated with the file, notifications, or the project’s trust status.
+Finally, look along the bottom edge of the window. This is the [status bar]{.glossary-term data-term="Status Bar"}. The information shown there changes with the workspace and the active file. It may display the current Git branch, the language associated with the file, notifications, or the project’s trust status.
 
 **Check:** Selecting a file in the Explorer opens it in an editor tab. Editing the file produces an unsaved-change indicator. Saving removes that indicator. Source Control then shows that the saved file differs from the version currently recorded by Git.
 
@@ -183,81 +185,59 @@ This confirms that saving and version control are connected but separate. Saving
 
 Understanding those roles makes the interface easier to navigate because an unfamiliar task can first be matched to the part of the workspace responsible for it.
 
-## Create and open a Quarto file
+## Create and open a Julia script
 
-A Quarto source document uses the `.qmd` file extension. It can contain prose, document structure, citations, figures, and executable code. We will begin with prose before adding Julia code.
+A [Julia script]{.glossary-term data-term="Julia Script"} is a plain-text file that contains Julia code and uses the `.jl` file extension. A script preserves the code so that it can be reviewed, revised, and run again.
 
-**Goal:** Create a Quarto file in the intended project folder, add content, save it, and reopen it.
+**Goal:** Create a Julia script in the intended project folder, add a small amount of code, save the file, and reopen it.
 
 **Code:**
 
-1. In the Explorer, select the folder where the document belongs.
+1. In the Explorer, select the folder where the script belongs.
 2. Select the **New File** icon.
-3. Enter a descriptive filename ending in `.qmd`.
+3. Enter a descriptive filename ending in `.jl`.
 
 For example:
 
 ```text
-navigation.qmd
+navigation_practice.jl
 ```
 
-Short, descriptive filenames are easier to recognize in the Explorer. Lowercase letters and hyphens also make filenames easier to use across different operating systems and publishing tools.
+Short, descriptive filenames are easier to recognize in the Explorer. Lowercase names with underscores are also easier to type than filenames containing spaces.
 
 Other examples include:
 
 ```text
-install-julia.qmd
-first-julia-code.qmd
+first_julia_code.jl
+simple_model.jl
 ```
 
-Add a small amount of Quarto content:
+Add a small amount of Julia code:
 
-```markdown
----
-title: "Navigate VS Code and Julia"
----
+```julia
+# This is a Julia script.
 
-This chapter introduces the tools surrounding a Julia project.
-
-## Understand the project
-
-A Quarto document uses Markdown to organize prose.
+project_name = "My Julia project"
+println(project_name)
 ```
 
-The lines between the `---` markers contain YAML metadata. In this example, the metadata gives the document a title.
-
-The remaining text is Markdown. Markdown uses plain-text symbols to represent document structure. For example:
-
-```markdown
-## A section heading
-
-**Bold text**
-
-*Italic text*
-
-- A list item
-- Another list item
-
-[Descriptive link text](https://example.com)
-
-`inline code`
-```
+The line beginning with `#` is a comment for the reader. The next line assigns text to the name `project_name`, and the final line asks Julia to print that text. These parts of Julia will be introduced more fully after the software is installed.
 
 Save the file by pressing **Command-S**. The unsaved dot in the editor tab should disappear.
 
 Close the editor tab, then select the file in the Explorer to open it again.
 
-**Check:** The `.qmd` file appears inside the intended project folder, its editor tab displays the correct filename, and the saved content remains after the tab is closed and reopened. These observations confirm both the file’s location and its saved contents.
+**Check:** The `.jl` file appears inside the intended project folder, its editor tab displays the correct filename, and the saved code remains after the tab is closed and reopened. These observations confirm both the file’s location and its saved contents.
 
 **Reflect:** A filename does not identify a file by itself. Its folder is also part of its identity. Two files can have the same name while belonging to different projects or different parts of the same project. Checking the Explorer before editing reduces the risk of changing an older copy, a temporary copy, or a similarly named file in the wrong location.
 
-Saving the `.qmd` file records changes to the source document. It does not yet create or update the rendered webpage.
+Saving the `.jl` file records changes to the script. It does not run the code. The next chapter will install Julia and establish how code moves from the script to the Julia runtime.
 
 ## Configure word wrap and autosave
 
-Long paragraphs can become difficult to read when they extend beyond the visible editor. Word wrap changes how those lines are displayed.
+[Word wrap]{.glossary-term data-term="Word Wrap"} changes how long lines are displayed in the editor. It can make long comments easier to read, although keeping lines of code reasonably short is still helpful.
 
-**Goal:** Make prose comfortable to read and configure VS Code to save changes automatically.
+**Goal:** Configure how long lines appear and allow VS Code to save changes automatically.
 
 **Code:**
 
@@ -278,166 +258,141 @@ To make word wrap persistent:
 
 A **User** setting applies across VS Code projects. A **Workspace** setting applies only to the current workspace.
 
-To turn on autosave:
+To turn on [autosave]{.glossary-term data-term="Autosave"}:
 
 1. Open the **File** menu.
 2. Select **Auto Save**.
 
 Autosave behavior can be adjusted by searching for `auto save` in Settings.
 
-**Check:** When the editor becomes narrower, the paragraph reflows to remain visible instead of extending beyond the right edge. The underlying paragraph has not gained new line breaks.
+**Check:** When the editor becomes narrower, a long comment reflows to remain visible instead of extending beyond the right edge. The source file has not gained new line breaks.
 
-After editing the document, the unsaved dot briefly appears and then disappears when autosave writes the change. Closing and reopening the file confirms that the change was saved.
+After editing the script, the unsaved dot briefly appears and then disappears when autosave writes the change. Closing and reopening the file confirms that the change was saved.
 
-**Reflect:** Word wrap changes the presentation of the text without changing the source file. Two people can therefore view the same paragraph at different editor widths without producing unnecessary changes in Git.
+**Reflect:** Word wrap changes the presentation of a line without changing the source file. Autosave changes the source file, but it does not run the code or decide whether the change was correct. Git provides a separate record of meaningful versions after changes are committed.
 
-Autosave reduces the risk of losing recent work, but it does not evaluate the quality of a change. If a sentence is deleted accidentally, autosave can preserve that deletion just as efficiently as it preserves an intended edit. Git provides a separate record of meaningful versions after changes are committed.
+## Recognize a Julia project environment
 
-## Preview the Quarto project
+A Julia script stores code. A Julia project environment records the packages that the code needs. Julia identifies an environment through a directory containing [`Project.toml`]{.glossary-term data-term="Project.toml"} and, when present, [`Manifest.toml`]{.glossary-term data-term="Manifest.toml"}.
 
-A `.qmd` file contains source material. Quarto reads that source and produces an output format such as HTML.
+`Project.toml` records information about the project and its direct package dependencies. `Manifest.toml` records the complete set of resolved dependencies and their versions. Julia’s package manager generates and maintains the manifest, so it should not ordinarily be edited by hand. Together, the files allow Julia to reconstruct the package environment used by a project. The [Julia documentation on project environments](https://docs.julialang.org/en/v1/manual/code-loading/#Environments) and [Pkg documentation on TOML files](https://pkgdocs.julialang.org/v1/toml-files/) describe these roles in detail.
 
-**Goal:** Preview the Quarto project and confirm that the saved source appears in the rendered output.
+The project folder will eventually have a structure similar to this:
+
+```text
+my-julia-project/
+├── Project.toml
+├── Manifest.toml
+└── navigation_practice.jl
+```
+
+The `.jl` file contains Julia instructions. The two `.toml` files describe the package environment in which those instructions run.
+
+**Goal:** Recognize the files associated with a Julia project environment and distinguish them from a Julia script.
 
 **Code:**
 
-1. Select **Terminal → New Terminal**.
-2. Confirm that the terminal opened inside the project folder.
-3. Enter:
+1. Look at the root of the repository in the Explorer.
+2. Locate the Julia script created in the previous section.
+3. Look for `Project.toml` and `Manifest.toml`.
+4. If either file is present, open it to see where it is stored, but do not change its contents.
 
-```bash
-quarto preview
-```
+These environment files may not exist yet. Julia is installed in the next chapter, and its package manager will create or update the files when the project environment is configured and packages are added. Do not create empty copies by hand merely to make them appear in the Explorer.
 
-4. Press **Return**.
+**Check:** You can identify the project’s root folder and explain where the Julia script and environment files belong. If the environment files are absent, you can explain why they have not been created yet.
 
-Quarto renders the project and usually opens the result in a web browser. The terminal remains active because Quarto is watching the project for additional saved changes.
+**Reflect:** A Julia project is more than a collection of scripts. The scripts preserve the instructions we wrote, while the project environment records the packages needed to carry out those instructions. Keeping both in the same project folder makes that relationship visible.
 
-Edit a sentence in a `.qmd` file and save it. Quarto should rebuild the affected material so that the browser displays the updated version.
+## Save the script and send changes to GitHub
 
-To stop the preview, return to the terminal and press:
+Saving, running, committing, and pushing affect different parts of the project:
 
-```text
-Control-C
-```
+- Saving writes changes to a file on the computer.
+- Running asks Julia to execute code. We will establish that process after Julia is installed.
+- Committing tells Git to record a meaningful version of selected changes in the local repository.
+- Pushing sends local commits to the remote repository on GitHub.
 
-**Check:** The project opens in the browser, the navigation links work, and the chapter contains the text saved in the `.qmd` file. The terminal remains active until the preview is stopped.
-
-If a saved change does not appear in the browser, the terminal output is the appropriate place to inspect what happened. The source may have saved successfully even when Quarto encountered a separate rendering problem.
-
-**Reflect:** Several actions in this workflow affect different versions of the project.
-
-Saving writes changes to the source file on the computer.
-
-Previewing asks Quarto to render the project and continue watching for additional saved changes.
-
-Rendering creates output from the source without necessarily keeping an active preview running.
-
-Committing tells Git to record a meaningful version of selected changes in the local repository.
-
-Pushing sends local commits to the remote repository on GitHub.
-
-A file can therefore be saved without being rendered, rendered without being committed, and committed without being pushed. Recognizing these layers makes it possible to identify where the project currently exists and which version another person can see.
-
-## Stop the preview and send changes to GitHub
-
-When `quarto preview` is running, the terminal is not stuck or waiting for an answer. Quarto is operating a local preview server and watching the project for saved changes. This is why the ordinary terminal prompt is unavailable.
-
-**Goal:** Stop the preview process, record the completed work in the local Git repository, and send that commit to GitHub.
+**Goal:** Record the completed work in the local Git repository and send that commit to GitHub.
 
 **Code:**
-
-Return to the terminal where `quarto preview` is running. Click inside the terminal, then press:
-
-```text
-Control-C
-```
-
-On a Mac, use **Control**, not **Command**. Quarto stops watching the project, and the ordinary terminal prompt returns. It will resemble:
-
-```text
-lorrainegaudio@Beefcake OER_julia %
-```
-
-The terminal is now ready to accept another command. The preview can be started again later by entering `quarto preview`.
-
-Next, use VS Code’s Source Control view to record the changes.
 
 1. Select the **Source Control** icon in the Activity Bar.
 2. Review the files listed under **Changes**.
 3. Select a file to see what changed.
-4. When the files belong in the project, hover over the **Changes** heading and select the **+** button to stage all of them.
+4. When a file belongs in the project, select the **+** button beside it to [stage]{.glossary-term data-term="Stage"} the change. To stage every listed file, select the **+** button beside the **Changes** heading.
 
 Staging prepares the selected changes for the next commit. The files move from **Changes** to **Staged Changes**.
 
 Enter a short commit message in the message box at the top of the Source Control view. The message should summarize what this version accomplishes. For example:
 
 ```text
-Add initial Quarto book and navigation chapter
+Add first Julia script
 ```
 
-Select **Commit**.
-
-The commit records the staged changes in the local Git repository. It does not send them to GitHub yet.
+Select **Commit**. A [commit]{.glossary-term data-term="Commit"} records the staged changes in the local Git repository. It does not send them to GitHub yet.
 
 After the commit:
 
 - Select **Publish Branch** if VS Code displays that option for the first commit.
 - Otherwise, select **Sync Changes**.
-- You can also open the **More Actions** menu represented by three dots and select **Push**.
+- You can also open the **More Actions** menu represented by three dots and select [Push]{.glossary-term data-term="Push"}.
 
 If VS Code asks for confirmation before publishing or synchronizing the branch, review the message and continue. Because the repository was cloned using SSH, Git uses the previously configured SSH connection to communicate with GitHub.
 
-The [VS Code source-control workflow](https://code.visualstudio.com/docs/sourcecontrol/quickstart) follows this sequence: review the changes, stage them, commit them locally, and then synchronize or push them to the remote repository. Quarto similarly documents **Control-C** as the command for [stopping an active preview](https://quarto.org/docs/manuscripts/authoring/jupyterlab.html).
+The [VS Code source-control workflow](https://code.visualstudio.com/docs/sourcecontrol/quickstart) follows this sequence: review the changes, stage them, commit them locally, and then synchronize or push them to the remote repository.
 
-**Check:** After the push finishes, the Source Control view no longer shows the committed files under **Changes** or **Staged Changes**. Refreshing the repository page on GitHub displays the project files and the new commit message.
+**Check:** After the push finishes, the Source Control view no longer shows the committed files under **Changes** or **Staged Changes**. Refreshing the repository page on GitHub displays the Julia script and the new commit message.
 
-**Reflect:** The preview terminal remained occupied because Quarto was performing an ongoing task. Stopping the preview ended that process but did not affect the project files.
-
-Saving, committing, and pushing also performed different tasks. Saving wrote the edits to the files on the computer. Committing recorded a meaningful version in the local repository. Pushing copied that commit to the remote repository on GitHub. The changes were not safely available from GitHub until all three steps were complete.
+**Reflect:** Saving wrote the script to the computer. Committing recorded a meaningful version in the local repository. Pushing copied that commit to the remote repository on GitHub. Running the script will be a separate action once the Julia runtime is installed. Recognizing these layers makes it easier to determine where the project currently exists and which version another person can see.
 
 ## Summary
 
-In this chapter, you established the working structure for a Quarto and Julia project before beginning to write Julia code. You created a remote repository on GitHub, cloned it onto your computer, and learned how the same project folder functions as a local Git repository, VS Code workspace, and Quarto project. You navigated the main parts of the VS Code interface, created and saved a Quarto file, configured word wrap and autosave, previewed the rendered project, and stopped the active preview process. Finally, you staged, committed, and pushed your changes to GitHub. Together, these activities distinguish four easily confused actions: saving changes to local source files, rendering those files with Quarto, recording a version with Git, and sending that version to GitHub.
+In this chapter, you established the working structure for a Julia project before running Julia code. You created a remote repository on GitHub, cloned it onto your computer, and learned how the same project folder can function as a local Git repository, a VS Code workspace, and the location of a Julia project environment. You navigated the main parts of the VS Code interface, created and saved a Julia script, configured word wrap and autosave, and identified the roles of `Project.toml` and `Manifest.toml`. Finally, you staged, committed, and pushed your changes to GitHub. Together, these activities distinguish the project’s files, environment, editing interface, version history, and remote copy.
 
-## Chapter terms
+## Chapter Terms {#chapter-terms}
 
-**Activity Bar:** The vertical group of icons used to switch among major VS Code views.
+**Activity Bar**: The vertical group of icons used to switch among major VS Code views.
 
-**autosave:** A VS Code feature that writes changes to a file automatically according to a configured trigger or delay.
+**Autosave**: A VS Code feature that writes changes to a file automatically according to a configured trigger or delay.
 
-**clone:** To create a connected local copy of a remote Git repository.
+**Clone**: To create a connected local copy of a remote Git repository.
 
-**Command Palette:** A searchable interface for locating and running VS Code commands.
+**Command Palette**: A searchable interface for locating and running VS Code commands.
 
-**commit:** A version of selected changes recorded in the local Git repository.
+**Commit**: A version of selected changes recorded in the local Git repository.
 
-**editor:** The central area where the contents of an active file are displayed and changed.
+**Editor**: The central area where the contents of an active file are displayed and changed.
 
-**editor tab:** A tab above the editor used to move among open files and observe whether they have unsaved changes.
+**Editor Tab**: A tab above the editor used to move among open files and observe whether they have unsaved changes.
 
-**Explorer:** The VS Code view that displays the folders and files in the open workspace.
+**Explorer**: The VS Code view that displays the folders and files in the open workspace.
 
-**GitHub repository:** A remote Git repository hosted on GitHub.
+**GitHub Repository**: A remote Git repository hosted on GitHub.
 
-**integrated terminal:** A command-line interface that opens inside VS Code.
+**Integrated Terminal**: A command-line interface that opens inside VS Code.
 
-**local repository:** A project folder on the computer that Git tracks.
+**Julia Project Environment**: The package requirements and resolved versions associated with a Julia project, recorded in `Project.toml` and, when present, `Manifest.toml`.
 
-**preview:** A continuing Quarto process that renders a project and watches for saved changes.
+**Julia Script**: A plain-text file with the `.jl` extension that contains Julia code. A Julia script can be opened and edited in a code editor such as VS Code, then run by Julia.
 
-**push:** To send local Git commits to a remote repository.
+**Local Repository**: A project folder on the computer that Git tracks.
 
-**Quarto project:** A collection of Quarto source files and configuration stored in a project folder.
+**Manifest.toml**: A file generated and maintained by Julia’s package manager that records the complete dependency graph and resolved package versions for a project environment.
 
-**render:** To transform Quarto source material into an output format such as HTML.
+**Project.toml**: A file that identifies a Julia project environment and records project information and direct package dependencies.
 
-**SSH address:** An address Git uses to communicate securely with a remote repository. It is different from a private SSH key.
+**Push**: To send local Git commits to a remote repository.
 
-**status bar:** The area at the bottom of VS Code that displays information about the workspace and active file.
+**Source Control**: The VS Code view used to inspect, stage, commit, and synchronize changes tracked by Git.
 
-**VS Code workspace:** The folder or collection of folders currently open in a VS Code window.
+**SSH Address**: An address Git uses to communicate securely with a remote repository. It is different from a private SSH key.
 
-**Workspace Trust:** A VS Code security feature that restricts potentially executable features in unfamiliar folders.
+**Stage**: To prepare selected file changes for inclusion in the next Git commit.
 
-**word wrap:** A display setting that fits long lines within the visible editor width without changing the source text.
+**Status Bar**: The area at the bottom of VS Code that displays information about the workspace and active file.
+
+**VS Code Workspace**: The folder or collection of folders currently open in a VS Code window.
+
+**Workspace Trust**: A VS Code security feature that restricts potentially executable features in unfamiliar folders.
+
+**Word Wrap**: A display setting that fits long lines within the visible editor width without changing the source text.

@@ -46,12 +46,133 @@ format:
     toc-title: "On this page"
     toc-expand: true
     anchor-sections: true
+    smooth-scroll: true
     number-sections: false
     code-copy: true
     code-overflow: wrap
-    smooth-scroll: true
+    lightbox: true
     link-external-newwindow: true
+    include-after-body:
+      text: |
+        <script>
+        document.addEventListener("DOMContentLoaded", function () {
+          if (typeof bootstrap === "undefined") return;
 
+          function normalizeTerm(text) {
+            return String(text || "")
+              .toLowerCase()
+              .replace(/[’']/g, "")
+              .replace(/[^a-z0-9]+/g, " ")
+              .replace(/\s+/g, " ")
+              .trim();
+          }
+
+          function getDefinitionNodes(chapterTermsContainer) {
+            const nodes = [];
+
+            if (!chapterTermsContainer) return nodes;
+
+            /*
+              Quarto often places the id on a <section>, not directly on the heading.
+              In that case, the term paragraphs are children inside the section.
+            */
+            if (chapterTermsContainer.tagName === "SECTION") {
+              Array.from(chapterTermsContainer.children).forEach(function (child) {
+                if (child.matches("p, li")) {
+                  nodes.push(child);
+                }
+              });
+
+              return nodes;
+            }
+
+            /*
+              Fallback: if the id is on the heading itself, collect paragraphs
+              after the heading until the next major section.
+            */
+            let node = chapterTermsContainer.nextElementSibling;
+
+            while (node && !["H1", "H2"].includes(node.tagName)) {
+              if (node.matches && node.matches("p, li")) {
+                nodes.push(node);
+              }
+
+              node = node.nextElementSibling;
+            }
+
+            return nodes;
+          }
+
+          function getChapterTerms() {
+            const terms = new Map();
+            const chapterTermsContainer = document.getElementById("chapter-terms");
+            const definitionNodes = getDefinitionNodes(chapterTermsContainer);
+
+            definitionNodes.forEach(function (node) {
+              const strong = node.querySelector("strong");
+              if (!strong) return;
+
+              const fullText = node.textContent.replace(/\s+/g, " ").trim();
+              const strongTerm = strong.textContent.replace(/\s+/g, " ").trim();
+              const colonIndex = fullText.indexOf(":");
+
+              if (colonIndex === -1) return;
+
+              const fullTerm = fullText.slice(0, colonIndex).trim();
+              const definition = fullText.slice(colonIndex + 1).trim();
+
+              if (!strongTerm || !definition) return;
+
+              const entry = {
+                title: fullTerm,
+                definition: definition
+              };
+
+              terms.set(normalizeTerm(strongTerm), entry);
+              terms.set(normalizeTerm(fullTerm), entry);
+            });
+
+            return terms;
+          }
+
+          const chapterTerms = getChapterTerms();
+
+          document.querySelectorAll(".glossary-term").forEach(function (termElement) {
+            const dataTerm = termElement.getAttribute("data-term");
+            const requestedTerm = dataTerm && dataTerm.trim()
+              ? dataTerm.trim()
+              : termElement.textContent.trim();
+
+            const glossaryEntry = chapterTerms.get(normalizeTerm(requestedTerm));
+
+            if (!glossaryEntry) {
+              termElement.classList.add("glossary-term-missing");
+              termElement.setAttribute("title", "Definition not found in Chapter Terms.");
+              console.warn("Glossary definition not found for:", requestedTerm);
+              return;
+            }
+
+            termElement.setAttribute("tabindex", "0");
+            termElement.setAttribute("role", "button");
+            termElement.setAttribute("data-bs-toggle", "popover");
+            termElement.setAttribute("data-bs-trigger", "hover focus");
+            termElement.setAttribute("data-bs-placement", "auto");
+            termElement.setAttribute("data-bs-title", glossaryEntry.title);
+            termElement.setAttribute("data-bs-content", glossaryEntry.definition);
+
+            const existingPopover = bootstrap.Popover.getInstance(termElement);
+            if (existingPopover) {
+              existingPopover.dispose();
+            }
+
+            new bootstrap.Popover(termElement, {
+              container: "body",
+              html: false,
+              customClass: "glossary-popover"
+            });
+          });
+        });
+        </script>
 execute:
   freeze: auto
 

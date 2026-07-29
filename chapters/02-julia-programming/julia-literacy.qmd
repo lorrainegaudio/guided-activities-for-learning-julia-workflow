@@ -314,7 +314,7 @@ For more detail, see Julia's official documentation for [vectorized dot operator
 
 Julia packages extend the language with additional data structures, functions, and datasets. Installing and loading a Julia package resembles the corresponding R workflow:
 
-- `Pkg.add("RDatasets")` is similar to `install.packages("RDatasets")`. It adds the package to the active project environment.
+- `Pkg.add("RDatasets")` is similar to `install.packages("package.name")`. It adds the package to the active project environment.
 - `using RDatasets` is similar to `library(RDatasets)`. It loads the package for the current Julia session.
 
 Installation is normally required once for a project environment on a computer. Loading is required in each new Julia session and each reproducible Quarto render that uses the package.
