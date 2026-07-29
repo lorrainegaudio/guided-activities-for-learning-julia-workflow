@@ -1,6 +1,6 @@
 ---
-title: "Navigate VS Code and GitHub"
-subtitle: "Folders, project environments, and repositories"
+title: "Chapter 2"
+subtitle: "Navigate VS Code and GitHub"
 toc: true
 ---
 
@@ -163,13 +163,7 @@ The vertical strip along the far-left edge is the [Activity Bar]{.glossary-term 
 
 Select the [Explorer]{.glossary-term data-term="Explorer"} icon. The Explorer displays the folders and files in the workspace. The name at the top indicates which folder VS Code currently has open.
 
-Select a file in the Explorer. The file opens in the central [editor]{.glossary-term data-term="Editor"}. You likely see a "Welcome" tab in this pane. Opening another file creates another [editor tab]{.glossary-term data-term="Editor Tab"} above the editor. These tabs make it possible to move among open files without changing their locations in the project.
-
-After changing a file, a dot may appear in its editor tab. The dot indicates that the editor contains changes that have not yet been saved.
-
-Select the **Source Control** icon. This view shows files that Git recognizes as changed.
-
-Select the **Extensions** icon. This view is where VS Code extensions are found and managed. Extensions add support for tools and programming languages, including Julia.
+Select a file in the Explorer. The file opens in the central [editor]{.glossary-term data-term="Editor"}. You likely see a "Welcome" tab in this pane. Opening another file creates another [editor tab]{.glossary-term data-term="Editor Tab"} above the editor. Select the **Extensions** icon. This view is where VS Code extensions are found and managed. Extensions add support for tools and programming languages, including Julia.
 
 Open the [Command Palette]{.glossary-term data-term="Command Palette"} by pressing **Command-Shift-P**. The Command Palette provides a searchable way to find commands without remembering where they appear in the menus. Press **Escape** to close it.
 
@@ -177,21 +171,13 @@ Open the [integrated terminal]{.glossary-term data-term="Integrated Terminal"} b
 
 Finally, look along the bottom edge of the window. This is the [status bar]{.glossary-term data-term="Status Bar"}. The information shown there changes with the workspace and the active file. It may display the current Git branch, the language associated with the file, notifications, or the project’s trust status.
 
-**Check:** Selecting a file in the Explorer opens it in an editor tab. Editing the file produces an unsaved-change indicator. Saving removes that indicator. Source Control then shows that the saved file differs from the version currently recorded by Git.
-
-This confirms that saving and version control are connected but separate. Saving writes the changes to the computer. Git notices the saved changes, but it does not automatically commit them.
-
-**Reflect:** VS Code separates the project into several views because each view answers a different kind of question. The Explorer shows where files are located. The editor shows what a file contains. Source Control shows what has changed. The terminal provides a place to run commands. The status bar provides information about the current context.
-
-Understanding those roles makes the interface easier to navigate because an unfamiliar task can first be matched to the part of the workspace responsible for it.
-
-## Create and open a Julia script
+## Julia script
 
 A [Julia script]{.glossary-term data-term="Julia Script"} is a plain-text file that contains Julia code and uses the `.jl` file extension. A script preserves the code so that it can be reviewed, revised, and run again.
 
-**Goal:** Create a Julia script in the intended project folder, add a small amount of code, save the file, and reopen it.
+**Goal:** Create a Julia script in the intended project folder.
 
-**Code:**
+**Tasks:**
 
 1. In the Explorer, select the folder where the script belongs.
 2. Select the **New File** icon.
@@ -205,12 +191,13 @@ navigation_practice.jl
 
 Short, descriptive filenames are easier to recognize in the Explorer. Lowercase names with underscores are also easier to type than filenames containing spaces.
 
-Other examples include:
+Notice that the new file opens a new tab next to the existing Welcome tab. These editor tabs make it possible to move among open files without changing their locations in the project.
 
-```text
-first_julia_code.jl
-simple_model.jl
-```
+After changing a file, a dot may appear in its editor tab. The dot indicates that the editor contains changes that have not yet been saved.
+
+### Add Julia Code
+
+**Goal:** Add a small amount of code to your .jl file, save the file, and reopen it.
 
 Add a small amount of Julia code:
 
@@ -229,79 +216,29 @@ Close the editor tab, then select the file in the Explorer to open it again.
 
 **Check:** The `.jl` file appears inside the intended project folder, its editor tab displays the correct filename, and the saved code remains after the tab is closed and reopened. These observations confirm both the file’s location and its saved contents.
 
-**Reflect:** A filename does not identify a file by itself. Its folder is also part of its identity. Two files can have the same name while belonging to different projects or different parts of the same project. Checking the Explorer before editing reduces the risk of changing an older copy, a temporary copy, or a similarly named file in the wrong location.
-
 Saving the `.jl` file records changes to the script. It does not run the code. The next chapter will install Julia and establish how code moves from the script to the Julia runtime.
 
-## Configure word wrap and autosave
+### Configure autosave
 
-[Word wrap]{.glossary-term data-term="Word Wrap"} changes how long lines are displayed in the editor. It can make long comments easier to read, although keeping lines of code reasonably short is still helpful.
 
-**Goal:** Configure how long lines appear and allow VS Code to save changes automatically.
+**Goal:** Turn on [autosave]{.glossary-term data-term="Autosave"} in VS Code.
 
-**Code:**
-
-Press:
-
-```text
-Option-Z
-```
-
-This toggles word wrap for the editor.
-
-To make word wrap persistent:
-
-1. Open Settings by pressing **Command-,**.
-2. Search for `word wrap`.
-3. Find **Editor: Word Wrap**.
-4. Change the setting to **on**.
-
-A **User** setting applies across VS Code projects. A **Workspace** setting applies only to the current workspace.
-
-To turn on [autosave]{.glossary-term data-term="Autosave"}:
+**Task:**
 
 1. Open the **File** menu.
 2. Select **Auto Save**.
 
 Autosave behavior can be adjusted by searching for `auto save` in Settings.
 
-**Check:** When the editor becomes narrower, a long comment reflows to remain visible instead of extending beyond the right edge. The source file has not gained new line breaks.
+**Check:** After editing the script, the unsaved dot briefly appears and then disappears when autosave writes the change. Closing and reopening the file confirms that the change was saved.
 
-After editing the script, the unsaved dot briefly appears and then disappears when autosave writes the change. Closing and reopening the file confirms that the change was saved.
+**Reflect:** Autosave changes the source file, but it does not run the code or decide whether the change was correct. 
 
-**Reflect:** Word wrap changes the presentation of a line without changing the source file. Autosave changes the source file, but it does not run the code or decide whether the change was correct. Git provides a separate record of meaningful versions after changes are committed.
+Git provides a separate record of meaningful versions after changes are committed.
 
-## Recognize a Julia project environment
+### Source Control
 
-A Julia script stores code. A Julia project environment records the packages that the code needs. Julia identifies an environment through a directory containing [`Project.toml`]{.glossary-term data-term="Project.toml"} and, when present, [`Manifest.toml`]{.glossary-term data-term="Manifest.toml"}.
-
-`Project.toml` records information about the project and its direct package dependencies. `Manifest.toml` records the complete set of resolved dependencies and their versions. Julia’s package manager generates and maintains the manifest, so it should not ordinarily be edited by hand. Together, the files allow Julia to reconstruct the package environment used by a project. The [Julia documentation on project environments](https://docs.julialang.org/en/v1/manual/code-loading/#Environments) and [Pkg documentation on TOML files](https://pkgdocs.julialang.org/v1/toml-files/) describe these roles in detail.
-
-The project folder will eventually have a structure similar to this:
-
-```text
-my-julia-project/
-├── Project.toml
-├── Manifest.toml
-└── navigation_practice.jl
-```
-
-The `.jl` file contains Julia instructions. The two `.toml` files describe the package environment in which those instructions run.
-
-**Goal:** Recognize the files associated with a Julia project environment and distinguish them from a Julia script.
-
-**Code:**
-
-1. Look at the root of the repository in the Explorer.
-2. Locate the Julia script created in the previous section.
-3. Look for `Project.toml` and `Manifest.toml`.
-4. If either file is present, open it to see where it is stored, but do not change its contents.
-
-These environment files may not exist yet. Julia is installed in the next chapter, and its package manager will create or update the files when the project environment is configured and packages are added. Do not create empty copies by hand merely to make them appear in the Explorer.
-
-**Check:** You can identify the project’s root folder and explain where the Julia script and environment files belong. If the environment files are absent, you can explain why they have not been created yet.
-
-**Reflect:** A Julia project is more than a collection of scripts. The scripts preserve the instructions we wrote, while the project environment records the packages needed to carry out those instructions. Keeping both in the same project folder makes that relationship visible.
+Select the **Source Control** icon. This view shows files that Git recognizes as changed.
 
 ## Save the script and send changes to GitHub
 
@@ -345,6 +282,84 @@ The [VS Code source-control workflow](https://code.visualstudio.com/docs/sourcec
 
 **Reflect:** Saving wrote the script to the computer. Committing recorded a meaningful version in the local repository. Pushing copied that commit to the remote repository on GitHub. Running the script will be a separate action once the Julia runtime is installed. Recognizing these layers makes it easier to determine where the project currently exists and which version another person can see.
 
+## Add a package
+
+A [package]{.glossary-term data-term="Package"} is a collection of Julia code that adds capabilities not included in the language itself. If you use R, this is similar to installing an R package. The tidyverse is a collection of related R packages; Julia tends to distribute data-science tools across separate packages.
+
+We will begin with [DataFrames.jl]{.glossary-term data-term="DataFrames.jl"}, a package for working with tabular data. It provides the `DataFrame` type, which serves a role similar to a data frame or tibble in R. Although the project is commonly called DataFrames.jl, the package name used in Julia code is `DataFrames`.
+
+Julia includes a built-in [package manager]{.glossary-term data-term="Package Manager (Pkg)"} called `Pkg`. The package manager installs packages and records which packages belong to a project. Packages required by a project or by another package are called [dependencies]{.glossary-term data-term="Dependency"}.
+
+**Goal:** Create a Julia project environment, add DataFrames.jl, and observe the files that Julia creates.
+
+**Code:**
+
+Make sure the project folder—not its parent folder—is open in VS Code.
+
+1. Open the Command Palette with **Command-Shift-P**.
+2. Enter `Julia: Start REPL`.
+3. Select the command.
+4. At the `julia>` prompt, enter:
+
+```julia
+pwd()
+```
+
+The displayed path should end with the name of the project folder shown at the top of the Explorer. If it shows a different folder, stop before adding the package. Open the correct project folder in VS Code and restart the Julia REPL.
+
+When the working directory is correct, enter these instructions at `julia>`, one line at a time:
+
+```julia
+import Pkg
+Pkg.activate(".")
+Pkg.add("DataFrames")
+```
+
+`import Pkg` makes Julia’s package manager available. `Pkg.activate(".")` selects the current folder as the active [Julia project environment]{.glossary-term data-term="Julia Project Environment"}. The period represents the current folder.
+
+`Pkg.add("DataFrames")` downloads DataFrames and any packages it depends on. It also creates or updates [`Project.toml`]{.glossary-term data-term="Project.toml"} and [`Manifest.toml`]{.glossary-term data-term="Manifest.toml"} in the project folder.
+
+The first installation may take some time while Julia downloads and precompiles packages. Wait until the `julia>` prompt returns before entering another instruction.
+
+Return to the Explorer. If necessary, select the **Refresh Explorer** button. The project folder should now have a structure similar to this:
+
+```text
+my-julia-project/
+├── Manifest.toml
+├── Project.toml
+└── navigation_practice.jl
+```
+
+Open `Project.toml`. Its `[deps]` section should contain an entry for DataFrames. This file records the package we intentionally added to the project.
+
+Open `Manifest.toml`. It will be considerably longer because it records DataFrames and the packages on which DataFrames depends. Julia’s package manager generates and maintains this file, so do not edit it manually.
+
+Return to `navigation_practice.jl` and replace its contents with:
+
+```julia
+using DataFrames
+
+script_files = DataFrame(
+    language = ["R", "Julia"],
+    extension = [".R", ".jl"],
+)
+
+println(script_files)
+```
+
+Save the script. With the file active in the editor:
+
+1. Open the Command Palette.
+2. Enter `Julia: Execute File in REPL`.
+3. Select the command.
+
+`using DataFrames` loads the installed package into the current Julia session. The remaining code creates and prints a small table comparing R and Julia script extensions.
+
+**Check:** The Julia REPL displays a two-row table containing `.R` and `.jl`. The Explorer contains `navigation_practice.jl`, `Project.toml`, and `Manifest.toml`. `Project.toml` lists DataFrames as a direct dependency.
+
+**Reflect:** Adding the package produced visible changes in the project folder. The script records how the package is used. `Project.toml` records the package we chose to add, while `Manifest.toml` records the complete set of package versions Julia resolved. Together, these files make it possible to identify both the code and the environment needed to run it.
+
+
 ## Summary
 
 In this chapter, you established the working structure for a Julia project before running Julia code. You created a remote repository on GitHub, cloned it onto your computer, and learned how the same project folder can function as a local Git repository, a VS Code workspace, and the location of a Julia project environment. You navigated the main parts of the VS Code interface, created and saved a Julia script, configured word wrap and autosave, and identified the roles of `Project.toml` and `Manifest.toml`. Finally, you staged, committed, and pushed your changes to GitHub. Together, these activities distinguish the project’s files, environment, editing interface, version history, and remote copy.
@@ -360,6 +375,10 @@ In this chapter, you established the working structure for a Julia project befor
 **Command Palette**: A searchable interface for locating and running VS Code commands.
 
 **Commit**: A version of selected changes recorded in the local Git repository.
+
+**Dependency**: A package required by a project or by another package.
+
+**DataFrames.jl**: A Julia package for creating and working with tabular data. It provides the `DataFrame` type, which serves a role similar to a data frame or tibble in R.
 
 **Editor**: The central area where the contents of an active file are displayed and changed.
 
@@ -379,6 +398,10 @@ In this chapter, you established the working structure for a Julia project befor
 
 **Manifest.toml**: A file generated and maintained by Julia’s package manager that records the complete dependency graph and resolved package versions for a project environment.
 
+**Package**: An installable collection of Julia code that adds functions, data structures, or other capabilities to the language.
+
+**Package Manager (Pkg)**: Julia’s built-in tool for adding, removing, updating, and recording packages within a project environment.
+
 **Project.toml**: A file that identifies a Julia project environment and records project information and direct package dependencies.
 
 **Push**: To send local Git commits to a remote repository.
@@ -395,4 +418,4 @@ In this chapter, you established the working structure for a Julia project befor
 
 **Workspace Trust**: A VS Code security feature that restricts potentially executable features in unfamiliar folders.
 
-**Word Wrap**: A display setting that fits long lines within the visible editor width without changing the source text.
+**Word Wrap**: A display setting that fits long lines within the visible editor width without changing the source text.**Package**: An installable collection of Julia code that adds functions, data structures, or other capabilities to the language.

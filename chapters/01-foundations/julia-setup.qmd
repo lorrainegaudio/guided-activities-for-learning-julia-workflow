@@ -1,134 +1,165 @@
 ---
-title: "Set Up Julia in VS Code"
-engine: julia
+title: "Chapter 1"
+subtitle: "Set Up Julia in VS Code"
 toc: true
+lang: en
 ---
 
 ## Overview
 
-Chapter 1 established the repository, opened it as a VS Code workspace, and introduced the file, editing, preview, and Source Control workflow. This chapter adds the software needed to execute Julia code. The goal is to establish each layer separately, verify that the layers can communicate, and then run Julia from inside a Quarto document.
+The first step in learning Julia is making sure that the necessary software is installed and that the pieces can communicate. Visual Studio Code provides the interface where we will work, Julia executes the code, and the Julia extension connects Julia-specific features to VS Code.
+
+This chapter installs each piece separately and verifies it before moving on. We will also become familiar with the parts of VS Code needed during setup, including the Command Palette and integrated terminal. Near the end of the chapter, we will start the Julia REPL and use a small calculation to confirm that Julia is ready to receive instructions.
 
 **After working through this chapter, you will be able to:**
 
-1.  Distinguish VS Code, Quarto, the Julia runtime, the Julia VS Code extension, the terminal, the shell, and the Julia REPL.
-2.  Use the Command Palette, Explorer, Outline, and terminal-session list to navigate the workflow.
-3.  Install Julia and the necessary VS Code extensions and verify that they work together.
-4.  Create a Quarto practice document and switch between its source and visual editors.
-5.  Execute a Julia code chunk interactively and during Quarto preview, and identify where the code ran.
+1. Distinguish VS Code, the Julia runtime, the Julia VS Code extension, the integrated terminal, the shell, and the Julia REPL.
+2. Install VS Code on a Mac and locate the parts of its interface used during setup.
+3. Install Julia with juliaup and verify that the shell can find and run it.
+4. Install the official Julia VS Code extension and verify that its commands are available.
+5. Start the integrated Julia REPL, evaluate a Julia expression, and inspect the installed Julia version.
+6. Distinguish a `zsh` terminal session from a Julia REPL session and end both deliberately.
 
 ## Understand the software layers
 
-A `.qmd` file can contain Julia code before Julia is installed. VS Code may even color the Julia syntax correctly. Neither observation proves that the computer can execute Julia.
-
-Several pieces of software participate in the workflow:
+The tools in this workflow have different responsibilities. Seeing Julia-related text or syntax coloring in an editor does not prove that the computer can execute Julia code. We will verify each layer by asking it to perform a small, observable task.
 
 | Component | Role in the workflow | Evidence that it works |
-|------------------------|------------------------|------------------------|
-| **VS Code** | Provides the interface for editing files, navigating the project, opening terminals, and using extensions. | The repository opens as a workspace and its files appear in the Explorer. |
-| **Quarto** | Converts `.qmd` source files into outputs such as HTML pages and books. | `quarto --version` returns a version and Quarto can preview a document. |
-| **Julia runtime** | Reads and executes Julia instructions. | `julia --version` returns a version and Julia evaluates an expression. |
-| **Julia VS Code extension** | Connects VS Code’s editor to Julia and provides an integrated Julia REPL, code completion, help, and execution commands. | `Julia: Start REPL` successfully opens a working Julia REPL. |
-| **Quarto VS Code extension** | Adds Quarto-aware editing, visual mode, code-cell controls, and preview commands to VS Code. | Quarto commands appear in the Command Palette and a `.qmd` file opens in visual mode. |
-| **Integrated terminal** | Provides a panel that can contain one or more text-based sessions. | The terminal panel opens and lists at least one session. |
-| **Shell** | Interprets operating-system commands inside a terminal session. On a current Mac, the default shell is usually `zsh`. | The prompt ends with `%` or `$`, and a command such as `quarto --version` runs. |
+|---|---|---|
+| **VS Code** | Provides the interface for editing files, navigating folders, opening terminals, and using extensions. | The application opens and its main interface is visible. |
+| **Julia runtime** | Reads and executes Julia instructions. | `julia --version` reports an installed version and Julia evaluates an expression. |
+| **Julia VS Code extension** | Connects VS Code to the Julia runtime and adds Julia-aware commands, editing support, help, and an integrated Julia REPL. | `Julia: Start REPL` opens a working Julia session inside VS Code. |
+| **Integrated terminal** | Provides a panel inside VS Code that can contain one or more terminal sessions. | The panel opens and displays a prompt. |
+| **[Shell]{.glossary-term data-term="Shell"}** | Interprets operating-system commands inside a terminal session. On a current Mac, the default shell is usually `zsh`. | The prompt ends with `%` or `$`, and a command such as `julia --version` runs. |
 | **Julia REPL** | Provides an interactive Julia session for entering expressions and immediately seeing their results. | The prompt says `julia>` and `6 * 7` returns `42`. |
 
-If you know RStudio, the closest comparison is:
+If you know RStudio, these comparisons may help:
 
 | Familiar RStudio feature | VS Code and Julia feature | Shared purpose |
-|------------------------|------------------------|------------------------|
-| **Console** | **Julia REPL** | Run language expressions interactively and retain values during the session. |
-| **Terminal** | **`zsh` terminal session** | Run operating-system commands and programs such as Quarto. |
-| **Files pane** | **Explorer** | Navigate project folders and files. |
-| **Document Outline** | **Outline view** | See the active document’s heading structure and jump to a section. |
+|---|---|---|
+| **R Console** | **Julia REPL** | Run language expressions interactively and retain values during the session. |
+| **Terminal** | **`zsh` terminal session** | Run operating-system commands and launch programs. |
+| **Files pane** | **Explorer** | Navigate folders and files. |
+| **Source editor** | **VS Code editor** | Read and edit code stored in files. |
 
 The Julia REPL is therefore similar to the R Console, even though VS Code displays it inside the terminal panel.
 
 **Reflect:** VS Code is the interface, Julia is the language runtime, and an extension connects them. Installing one does not automatically establish that the others are present or correctly connected.
 
-## Learn the VS Code controls used in this chapter
+## Install Visual Studio Code
+
+[Visual Studio Code (VS Code)]{.glossary-term data-term="Visual Studio Code (VS Code)"} is a code editor that can be extended to support different programming languages. These instructions use macOS on a Mac with Apple silicon. Readers using another operating system should follow the corresponding instructions on the official [VS Code download page](https://code.visualstudio.com/download).
+
+**Goal:** Install VS Code in the Applications folder and open it successfully.
+
+**Steps:**
+
+1. Open the official [VS Code installation instructions for macOS](https://code.visualstudio.com/docs/setup/mac).
+2. Download the macOS version of VS Code. The Universal build supports both Intel-based Macs and Macs with Apple silicon; an Apple-silicon-specific build is also available.
+3. Open the downloaded `.dmg` file.
+4. Drag **Visual Studio Code.app** into the **Applications** folder.
+5. Open the Applications folder and double-click **Visual Studio Code**.
+6. If macOS asks whether you want to open an application downloaded from the internet, confirm only after verifying that the application came from the official VS Code website.
+
+To keep VS Code in the Dock, Control-click its Dock icon and select **Options → Keep in Dock**.
+
+**Check:** VS Code opens and displays a window containing its Activity Bar, editor area, and status bar. On a Mac, select **Code → About Visual Studio Code** to view the installed version.
+
+**Reflect:** Installing VS Code provides the editor interface, but it does not install Julia. Julia must be installed separately before VS Code can run Julia code.
+
+## Learn the VS Code controls used during setup
+
+Only a few parts of the VS Code interface are needed during installation. We will return to the rest of the interface in the next chapter.
+
+### Recognize the main areas
+
+The vertical strip along the far-left edge is the [Activity Bar]{.glossary-term data-term="Activity Bar"}. Its icons open different views in the sidebar.
+
+Select the [Explorer]{.glossary-term data-term="Explorer"} icon. The Explorer is used to navigate folders and files. It may be mostly empty when no project folder has been opened.
+
+Select the [Extensions view]{.glossary-term data-term="Extensions View"}. An [extension]{.glossary-term data-term="Extension"} is an add-on that gives VS Code capabilities for a language or workflow. Later in this chapter, we will use this view to install Julia support.
+
+Look along the bottom edge of the window. This is the [status bar]{.glossary-term data-term="Status Bar"}. The information displayed there changes according to the active file, folder, and installed extensions.
 
 ### Use the Command Palette
 
-The **Command Palette** is a searchable menu of actions available in VS Code. It includes built-in commands and commands added by extensions. Open it with **Shift–Command–P**, type part of a command’s name, and select the command you want.
+The [Command Palette]{.glossary-term data-term="Command Palette"} is a searchable menu of actions available in VS Code. It includes built-in commands and commands added by extensions.
+
+Open it with **Shift–Command–P**, type part of a command’s name, and select the command you want. Press **Escape** to close it.
 
 This chapter uses commands such as:
 
 - `Developer: Reload Window`
 - `Julia: Start REPL`
-- `Julia: Execute Code in REPL`
-- `Quarto: Edit in Visual Mode`
-- `Quarto: Preview`
 
 The Command Palette is useful when you know what action you need but do not know where it appears in the menus. VS Code’s [user-interface guide](https://code.visualstudio.com/docs/editing/userinterface#_command-palette) describes it as the main keyboard-accessible route to editor commands.
 
 ### Recognize terminal sessions
 
-The integrated terminal is the entire panel at the bottom of VS Code. The panel can contain several independent **terminal sessions** at the same time.
+Open the [integrated terminal]{.glossary-term data-term="Integrated Terminal"} by selecting **Terminal → New Terminal**. The integrated terminal is the entire panel that opens near the bottom of VS Code. The panel can contain several independent [terminal sessions]{.glossary-term data-term="Terminal Session"} at the same time.
 
-Look at the list on the right side of the terminal panel. Each line represents one session and displays a name such as `zsh`, `Julia REPL`, or the name of a running task.
+Look at the session list on the right side of the terminal panel. Each line represents one session and displays a name such as `zsh` or, after Julia is installed, `Julia REPL`.
 
-1.  Click a name to display that session.
-2.  Click the **plus sign (`+`)** near the upper-right corner of the terminal panel to create another session.
-3.  Hover over an unneeded session and click its **trash-can** button to end and remove it.
+1. Click a session name to display that session.
+2. Click the **plus sign (`+`)** near the upper-right corner of the terminal panel to create another session.
+3. Hover over an unneeded session and click its **trash-can** button to end and remove it.
 
-Closing or hiding the terminal panel does not necessarily end the sessions inside it. VS Code can also restore terminal content or revive a terminal process after a window reload or application restart. This is why several `zsh` entries may appear if a new terminal was opened for each Quarto preview. If VS Code reports **History restored**, it has restored terminal scrollback from an earlier session. Use the terminal’s name and current prompt—not the old text above it—to determine what is ready to receive the next instruction. The [VS Code terminal guide](https://code.visualstudio.com/docs/terminal/basics#_managing-terminals) documents the terminal list, new-terminal button, and trash-can control.
+Closing or hiding the terminal panel does not necessarily end the sessions inside it. VS Code can also restore terminal content after a window reload or application restart. If VS Code reports **History restored**, use the session name and current prompt—not old text higher in the panel—to determine which program is ready to receive an instruction. The [VS Code terminal guide](https://code.visualstudio.com/docs/terminal/basics#_managing-terminals) documents the terminal list and session controls.
 
-**Check:** Open **Terminal → New Terminal**. Find the new `zsh` entry in the terminal list, click it, and locate the `%` prompt in the main terminal area.
+**Check:** Open **Terminal → New Terminal**. Find the new `zsh` entry in the session list, select it, and locate the prompt ending in `%` in the main terminal area.
 
-**Reflect:** A terminal panel is a container. A terminal session is one running environment inside that container. Later, you will keep a Julia REPL in one session and run Quarto from a separate `zsh` session.
+**Reflect:** The terminal panel is a container. A terminal session is one running shell, REPL, or other process inside that container.
 
 ## Install Julia with juliaup
 
-The Julia project recommends **juliaup** for installing Julia on macOS. Juliaup installs a current stable Julia release and provides a version manager that can update or switch Julia versions later. The current command is available from the official [Julia installation page](https://julialang.org/install/).
+[Juliaup]{.glossary-term data-term="juliaup"} is Julia’s recommended installer and version manager. It installs a current stable Julia release and can later update Julia or switch among Julia versions. The current installation command is available from the official [Julia installation page](https://julialang.org/install/).
 
 These instructions use the native Apple-silicon version of Julia.
 
-**Goal:** Install the Julia runtime from an ordinary `zsh` terminal and verify that the shell can locate and launch it.
+**Goal:** Install the [Julia runtime]{.glossary-term data-term="Julia Runtime"} from an ordinary `zsh` terminal and verify that the shell can locate and launch it.
 
 **Steps:**
 
-1.  Open a new integrated terminal in VS Code.
-2.  In the terminal-session list, select the session named `zsh`.
-3.  Confirm that the prompt ends with `%` and does not say `julia>`.
-4.  Check whether Julia is already available:
+1. Open a new integrated terminal in VS Code.
+2. In the terminal-session list, select the session named `zsh`.
+3. Confirm that the prompt ends with `%` and does not say `julia>`.
+4. Check whether Julia is already available:
 
-``` bash
+```bash
 julia --version
 ```
 
-If Julia is not installed, `zsh` will probably report `command not found: julia`. That result identifies the missing software layer.
+If this command reports a Julia version, Julia is already installed and does not need to be installed again. Continue with the verification steps below.
 
-5.  At the same ordinary shell prompt, enter:
+If Julia is not installed, `zsh` will probably report `command not found: julia`. At the same ordinary shell prompt, enter the official installation command:
 
-``` bash
+```bash
 curl -fsSL https://install.julialang.org | sh
 ```
 
 This command downloads the official juliaup installation script and passes it to the shell. Read the information displayed by the installer before accepting its proposed changes.
 
-6.  Follow the installer’s prompts and wait until it reports that Julia was successfully installed.
-7.  End the original terminal session with its trash-can button.
-8.  Open a fresh terminal with the **plus sign (`+`)** so the new `zsh` session loads the updated command path.
-9.  Run these commands one at a time:
+5. Follow the installer’s prompts and wait until it reports that Julia was successfully installed.
+6. End the original terminal session with its trash-can button.
+7. Open a fresh terminal with the **plus sign (`+`)** so the new `zsh` session loads the updated [PATH]{.glossary-term data-term="PATH"}.
+8. Run these commands one at a time:
 
-``` bash
+```bash
 juliaup status
 julia --version
-quarto --version
 ```
 
-`juliaup status` should list an installed Julia channel. `julia --version` should report the installed Julia version. `quarto --version` should report the existing Quarto installation.
+`juliaup status` should list an installed Julia channel. `julia --version` should report the installed Julia version.
 
-10. Verify that the Julia build matches the Mac’s Apple-silicon architecture:
+9. Verify that the Julia build matches the Mac’s Apple-silicon architecture:
 
-``` bash
+```bash
 julia -e 'println(Sys.ARCH)'
 ```
 
 **Check:** The final command should print:
 
-``` text
+```text
 aarch64
 ```
 
@@ -136,162 +167,70 @@ It should then return to the ordinary shell prompt. The `-e` option started Juli
 
 **Reflect:** These checks establish that Julia is installed, that the shell can find it through the command path, and that the native Apple-silicon build can run. Syntax highlighting alone would not establish any of those facts.
 
-## Install the VS Code extensions
+## Install the Julia VS Code extension
 
-VS Code extensions add capabilities to the editor, but they do not replace the underlying Julia or Quarto installations. This workflow uses both the Julia and Quarto extensions.
+The [Julia VS Code extension]{.glossary-term data-term="Julia VS Code Extension"} connects VS Code to the installed Julia runtime. It adds Julia-aware commands, syntax support, code completion, documentation, and an integrated Julia REPL. The extension does not include or replace Julia itself.
 
-**Goal:** Add the editor integrations required for Julia-enabled Quarto documents and verify that you selected the official extensions.
+**Goal:** Install the official Julia extension and verify that its commands are available.
 
 **Steps:**
 
-1.  Open the **Extensions** view from the Activity Bar.
-
-2.  Search for `Julia`.
-
-3.  Select the extension with all four of these identifying details:
+1. Open the **Extensions** view from the Activity Bar.
+2. Search for `Julia`.
+3. Select the extension with all four of these identifying details:
 
     - **Name:** Julia
     - **Description:** Julia Language Support
     - **Publisher:** julialang, with a verified-publisher checkmark
     - **Identifier:** `julialang.language-julia`
 
-    “Julia Language Support” is the description, not the extension’s identifier. To locate the identifier, click the extension to open its details page and look for **Identifier** in the extension information or **More Info** area.
+    “Julia Language Support” is the description, not the extension’s identifier. To locate the identifier, open the extension’s details page and look in the extension information or **More Info** area.
 
-4.  Click **Install**.
+4. Select **Install**.
 
-5.  Search for `Quarto`.
-
-6.  Select the Quarto extension with the identifier `quarto.quarto`.
-
-7.  Click **Install**.
-
-The official [Julia extension guide](https://www.julia-vscode.org/docs/stable/gettingstarted/) explains that the extension normally detects Julia automatically when the Julia executable is on the system command path. The [Quarto extension](https://marketplace.visualstudio.com/items?itemName=quarto.quarto) supplies Quarto-aware editing, visual mode, code-cell execution, and preview support.
+The official [Julia extension setup guide](https://www.julia-vscode.org/docs/stable/setup/) explains that the extension normally detects Julia automatically when the Julia executable is available on the system command path.
 
 ### Reload or restart VS Code
 
-Reload VS Code after installing the extensions:
+Reload VS Code after installing the extension:
 
-1.  Open the Command Palette with **Shift–Command–P**.
-2.  Search for `Developer: Reload Window`.
-3.  Select the command.
+1. Open the Command Palette with **Shift–Command–P**.
+2. Search for `Developer: Reload Window`.
+3. Select the command.
 
 Reloading the window restarts the VS Code interface and its extensions without quitting the entire application.
 
-If reloading does not resolve an extension or command-path problem, completely quit VS Code with **Command–Q**, then reopen it. Clicking the red window button may close the window without quitting the application. VS Code normally reopens the recent workspace automatically; if it does not, use **File → Open Folder…** and select the repository folder.
+If reloading does not resolve an extension or command-path problem, completely quit VS Code with **Command–Q**, then reopen it. Clicking the red window button may close the window without quitting the application.
 
-When VS Code, Julia, or Quarto first accesses a folder or starts an integrated process, macOS may display permission requests. Read each request and approve it when it clearly corresponds to the action you just initiated. If the requested access is unexpected, pause and investigate the request before approving it.
+When VS Code or Julia first starts an integrated process, macOS may display a permission request. Read the request and approve it only when it clearly corresponds to the action you just initiated. If the requested access is unexpected, pause and investigate before approving it.
 
-**Check:** In the Extensions view, both extensions should display **Installed** or offer controls to disable or uninstall them. Open the Command Palette and type `Julia:`; `Julia: Start REPL` should appear. Type `Quarto:`; Quarto editing and preview commands should appear.
+**Check:** In the Extensions view, the Julia extension should display **Installed** or offer controls to disable or uninstall it. Open the Command Palette and enter `Julia:`. The command `Julia: Start REPL` should appear.
 
-**Reflect:** The presence of commands verifies that the extensions are installed and enabled. Executing those commands successfully will provide stronger evidence that the extensions are connected to their underlying software.
-
-## Create a Julia practice document
-
-You will create a small practice document inside the repository established in Chapter 1. The same file will support the remaining activities in this chapter.
-
-**Goal:** Create a folder and a `.qmd` file that Quarto can render with the Julia engine.
-
-**Steps:**
-
-1.  Open the Explorer from the Activity Bar, or press **Shift–Command–E**.
-2.  Select the repository’s top-level folder in the Explorer.
-3.  Click the **New Folder** button and name the folder:
-
-``` text
-practice
-```
-
-4.  Select the new `practice` folder.
-5.  Click the **New File** button and name the file:
-
-``` text
-julia-practice.qmd
-```
-
-6.  Enter the following content:
-
-``` markdown
----
-title: "Julia Practice"
-format: html
-engine: julia
----
-
-## Try Julia in Quarto
-
-This document tests the connection among VS Code, Julia, and Quarto.
-```
-
-7.  Save the file with **Command–S**.
-
-The `.qmd` extension identifies a Quarto Markdown document. The YAML between the two `---` lines gives Quarto document-level instructions. `format: html` selects an HTML output, and `engine: julia` tells Quarto to use its Julia execution engine for executable code chunks.
-
-**Check:** The Explorer should now show `julia-practice.qmd` inside the `practice` folder.
-
-**Reflect:** Creating a `.qmd` file establishes a document that can contain prose and code. It does not execute Julia by itself.
-
-## Navigate and edit the Quarto document
-
-### Use the Outline
-
-VS Code’s **Outline** is the closest equivalent to RStudio’s Document Outline. It appears as a separate section near the bottom of the Explorer and displays the heading structure of the active file.
-
-1.  Keep `julia-practice.qmd` active in the editor.
-2.  Find **Outline** near the bottom of the Explorer and expand it.
-3.  Find **Try Julia in Quarto** in the Outline.
-4.  Click that heading to jump to the section.
-
-If Outline is not visible, open the Command Palette, run `View: Open View`, and select `Outline`. The [VS Code interface guide](https://code.visualstudio.com/docs/editing/userinterface#_outline-view) explains that the Outline shows the symbol tree of the active editor; for Markdown documents, that tree is the heading hierarchy.
-
-The narrow strip on the right side of the editor is the **minimap**. It is a compressed visual overview of the whole file, not a readable table of contents. Clicking or dragging its shaded area moves to another part of the document. For heading-based navigation, use the Outline.
-
-### Switch between source and visual editing
-
-The Quarto extension provides two ways to edit the same `.qmd` file.
-
-The **source editor** exposes the document’s YAML, Markdown, links, attributes, and code fences directly. It is the clearest view for inspecting document structure, correcting syntax, and writing executable code chunks.
-
-The **visual editor** displays headings, lists, links, emphasis, and other elements in a formatted form. It can be more comfortable for revising prose, working with citations, and editing tables.
-
-**Steps:**
-
-1.  Begin in source mode and identify the YAML at the top of `julia-practice.qmd`.
-2.  Press **Shift–Command–F4** to switch editing modes.
-3.  If the shortcut does not switch modes, right-click inside the document and choose **Edit in Visual Mode**, or open the Command Palette and run `Quarto: Edit in Visual Mode`.
-4.  Observe how the title, heading, and paragraph are displayed.
-5.  Switch back with **Shift–Command–F4** or `Quarto: Edit in Source Mode`.
-
-Quarto documents can also be opened with a chosen editor by right-clicking the file in the Explorer, selecting **Open With…**, and choosing the source or visual editor. See Quarto’s official [visual editing guide](https://quarto.org/docs/tools/vscode/visual-editor.html) for the available editing commands and options.
-
-**Check:** Source mode should expose characters such as `---` and `##`. Visual mode should present much of that syntax as formatted content. Switching views should not create a second `.qmd` file.
-
-**Reflect:** Source and visual mode provide different representations of the same document. The visual editor may normalize Markdown into Pandoc conventions when it writes the file, so source mode remains useful when exact syntax matters.
+**Reflect:** The presence of Julia commands verifies that the extension is installed and enabled. Starting the REPL successfully will provide stronger evidence that the extension found the Julia runtime.
 
 ## Start and verify the Julia REPL
 
-The Julia extension can start an integrated Julia REPL. **REPL** stands for Read–Eval–Print Loop: it reads an expression, evaluates it, prints the result, and waits for another expression.
+The [Julia REPL]{.glossary-term data-term="Julia REPL"} is an interactive Julia session. REPL stands for *Read–Eval–Print Loop*: Julia reads an expression, evaluates it, prints the result, and waits for another expression.
 
-Starting Julia by typing `julia` at an ordinary shell prompt also creates a Julia REPL. However, the REPL started with the extension’s `Julia: Start REPL` command includes additional VS Code integration. The official [Julia extension documentation](https://www.julia-vscode.org/docs/stable/userguide/runningcode/) therefore recommends that command for interactive work in VS Code.
+Starting Julia by typing `julia` at an ordinary shell prompt also creates a Julia REPL. However, the REPL started with the extension’s `Julia: Start REPL` command includes additional VS Code integration. The official [Julia extension documentation](https://www.julia-vscode.org/docs/stable/userguide/runningcode/) recommends using that command for interactive work in VS Code.
 
 **Goal:** Demonstrate that the Julia extension located the installed Julia runtime and can start an integrated session.
 
 **Steps:**
 
-1.  Open the Command Palette with **Shift–Command–P**.
-2.  Enter `Julia: Start REPL`.
-3.  Select the command and allow Julia time to start. On the first launch, macOS may display permission requests as VS Code starts Julia or accesses the project folder. Read each request and approve it only when it corresponds to the action you just initiated.
-4.  Look at the terminal-session list.
-5.  Select the new Julia session and confirm that the main terminal area contains a Julia banner and a `julia>` prompt.
-6.  At the `julia>` prompt, enter:
-
-
+1. Open the Command Palette with **Shift–Command–P**.
+2. Enter `Julia: Start REPL`.
+3. Select the command and allow Julia time to start.
+4. Look at the terminal-session list.
+5. Select the new Julia session and confirm that the main terminal area contains a Julia banner and a `julia>` prompt.
+6. At the `julia>` prompt, enter:
 
 ```julia
 6 * 7
 ```
 
-7.  Press **Return**.
-8.  At the next `julia>` prompt, enter:
+7. Press **Return**.
+8. At the next `julia>` prompt, enter:
 
 ```julia
 versioninfo()
@@ -299,143 +238,73 @@ versioninfo()
 
 **Check:** The first expression should return:
 
-``` text
+```text
 42
 ```
 
-`versioninfo()` should report a Julia version and system information consistent with the Apple-silicon Mac. The prompt should return to `julia>` after each expression.
-
-Now click between the Julia session and the `zsh` session in the terminal list. Notice that the visible prompt changes:
-
-``` text
-zsh session:    lorraine@Beefcake OER_julia %
-Julia session:  julia>
-```
+`versioninfo()` should report the Julia version and system information. On a Mac with Apple silicon, the report should identify the machine architecture as ARM or `aarch64`. The prompt should return to `julia>` after each expression.
 
 **Reflect:** This test establishes more than successful installation. The `Julia: Start REPL` command came from the extension, the extension found the Julia runtime, and the runtime evaluated Julia code. The Julia REPL is serving the role that the Console serves in RStudio.
 
-## Keep Julia and Quarto terminals available
+## Distinguish the shell from the Julia REPL
 
-Julia code and shell commands must go to the correct interpreter. You can keep both interpreters available by using two terminal sessions.
+Julia expressions and shell commands must go to the program that understands them. VS Code can keep a shell and a Julia REPL available as separate terminal sessions.
 
-1.  Leave the Julia REPL running.
-2.  Click the **plus sign (`+`)** in the terminal panel to create another terminal.
-3.  Find the new `zsh` entry in the terminal-session list.
-4.  Toggle between `zsh` and the Julia session by clicking their names.
+1. Leave the Julia REPL running.
+2. Click the **plus sign (`+`)** in the terminal panel to create another terminal.
+3. Find the new [`zsh`]{.glossary-term data-term="zsh"} entry in the terminal-session list.
+4. Toggle between `zsh` and the Julia session by selecting their names.
 
 Use the prompts as evidence:
 
 - Enter Julia expressions such as `6 * 7` or `versioninfo()` at `julia>`.
-- Enter shell commands such as `julia --version` or `quarto preview` at the prompt ending in `%`.
+- Enter shell commands such as `julia --version` at the prompt ending in `%`.
 - Do not copy either prompt as part of a command.
 
-Do not enter `quarto preview` at `julia>`. Julia would try to interpret those words as Julia code.
+The visible prompts will resemble:
+
+```text
+zsh session:    your-name@computer-name ~ %
+Julia session:  julia>
+```
 
 If several old `zsh` sessions appear, keep one ordinary shell session and use the trash-can buttons to end the extras.
 
-**Check:** The terminal-session list should contain at least one Julia session and one `zsh` session. Selecting each should display a different prompt.
+**Check:** The terminal-session list contains at least one Julia session and one `zsh` session. Selecting each displays a different prompt.
 
-**Reflect:** The terminal panel can hold several sessions. Switching sessions is analogous to moving between RStudio’s Console and Terminal panes, even though VS Code places both sessions in one terminal panel.
-
-## Add and run a Julia code chunk
-
-An executable Quarto **code chunk** begins with three backticks followed by a language name inside braces. The braces distinguish an executable chunk from a static code example.
-
-**Goal:** Add a Julia chunk to the practice document, execute it interactively, and observe where its output appears.
-
-**Steps:**
-
-1.  Return to `practice/julia-practice.qmd`.
-2.  Make sure the file is in source mode.
-3.  Under the paragraph in **Try Julia in Quarto**, enter the following chunk, including the opening and closing fences:
-
-```` markdown
-```{julia}
-message = "Julia ran this Quarto code chunk."
-answer = 6 * 7
-
-println(message)
-answer
-```
-````
-
-The first two lines create values. `println(message)` explicitly prints the message. The final expression returns the value stored in `answer`.
-
-4.  Save the file.
-5.  Make sure the Julia REPL is still open and displays a `julia>` prompt.
-6.  Place the cursor inside the executable Julia chunk.
-7.  Use the chunk’s **Run Cell** control if it appears above the chunk.
-8.  If no Run Cell control appears, select the Julia statements without selecting the backtick fences.
-9.  Open the Command Palette and run `Julia: Execute Code in REPL`.
-
-The Quarto extension integrates with the Julia extension to provide Julia code completion, cell execution, and contextual help in `.qmd` files. See the [Quarto Julia guide](https://quarto.org/docs/computations/julia.html#vs-code) for this editor integration.
-
-**Check:** Select the Julia session in the terminal list. The Julia REPL should display the message and the value `42`.
-
-``` text
-Julia ran this Quarto code chunk.
-42
-```
-
-**Reflect:** During this interactive action, the editor sent the selected Julia statements to the visible Julia REPL. The code did not execute merely because it was saved in a `.qmd` file.
-
-## Execute the chunk during Quarto preview
-
-Interactive cell execution and Quarto rendering are related but separate workflows. Interactive execution supports exploration. Quarto execution produces the reproducible output included in the rendered document.
-
-**Goal:** Keep the Julia REPL available while Quarto uses a separate Julia worker to render the practice document.
-
-**Steps:**
-
-1.  Save `julia-practice.qmd`.
-2.  In the terminal-session list, select the `zsh` session with a prompt ending in `%`.
-3.  Enter:
-
-``` bash
-quarto preview practice/julia-practice.qmd
-```
-
-You may instead keep `julia-practice.qmd` active, open the Command Palette, and run `Quarto: Preview`. The explicit terminal command makes the target file visible and prevents confusion about which document is being previewed.
-
-During the first render of a document with `engine: julia`, Quarto automatically installs `QuartoNotebookRunner.jl` into a private environment owned by Quarto. Quarto then starts a separate Julia worker process to execute the document. This initial setup may take longer than later previews.
-
-4.  While the preview is running, look again at the terminal-session list.
-5.  Toggle between the Julia REPL and the terminal running Quarto.
-
-**Check:** The Quarto process should complete its initial render without a Julia execution error. In the rendered HTML document, the code chunk should be followed by the printed message and the value `42`.
-
-The same source code has now run in two contexts:
-
-| Action | Where the code runs | Primary purpose |
-|------------------------|------------------------|------------------------|
-| Enter an expression at `julia>` | The visible Julia REPL | Explore one expression interactively. |
-| Run a Quarto cell from the editor | The Julia REPL started by the VS Code extension | Test document code interactively. |
-| Preview or render the `.qmd` file | A Julia worker managed by Quarto’s Julia engine | Produce reproducible document output. |
-
-**Reflect:** Quarto did not reuse the visible Julia REPL. It used its own Julia-engine process to render the document. The terminal-session list lets you retain and inspect the interactive and document-rendering workflows separately.
+**Reflect:** The terminal panel can hold several sessions. Switching sessions is analogous to moving between RStudio’s Console and Terminal panes, even though VS Code places both sessions in one panel.
 
 ## End the sessions deliberately
 
-A running process can retain variables, watch files for changes, or continue using computer resources until it is stopped.
+A running session can retain values or continue using computer resources until it is stopped.
 
-1.  Select the `zsh` session running Quarto preview.
-2.  Press **Control–C** to stop the preview and return to the ordinary shell prompt.
-3.  Select the Julia REPL session.
-4.  At `julia>`, enter:
+1. Select the Julia REPL session.
+2. At `julia>`, enter:
 
-``` julia
+```julia
 exit()
 ```
 
 The `julia>` prompt should disappear. Depending on how the extension created the session, the terminal may close or return control to a shell.
 
-5.  Use the trash-can buttons to remove terminal sessions you no longer need.
+3. Select an ordinary `zsh` session that is no longer needed.
+4. Enter:
 
-**Reflect:** Hiding the terminal panel, stopping a running program, and removing a terminal session are different actions. Ending them deliberately makes their state visible.
+```bash
+exit
+```
+
+You can also use the trash-can button to end and remove a terminal session.
+
+**Check:** The ended sessions no longer display an active `julia>` or `%` prompt waiting for input.
+
+**Reflect:** Hiding the terminal panel, stopping a running program, and removing a terminal session are different actions. Ending sessions deliberately makes their state visible.
 
 ## Diagnose common setup problems
 
 A failed check identifies which layer requires attention. It does not mean that the entire installation must be repeated.
+
+- If VS Code does not open after downloading, confirm that **Visual Studio Code.app** was moved into the Applications folder and that it came from the official VS Code website.
 
 - If `julia --version` returns `command not found`, end the existing `zsh` session and open a fresh one. If the problem remains, check whether `juliaup status` works and review the juliaup installer’s completion message.
 
@@ -443,62 +312,50 @@ A failed check identifies which layer requires attention. It does not mean that 
 
 - If `Julia: Start REPL` is absent from the Command Palette, confirm that the Julia extension is installed and enabled. Then run `Developer: Reload Window`.
 
-- If `julia --version` works in a new terminal but the extension or Quarto still cannot find Julia, completely quit VS Code with **Command–Q** and reopen it. If automatic detection still fails, run `which julia` in `zsh` and use the returned executable location for the extension’s `julia.executablePath` setting.
+- If `julia --version` works in a new terminal but the extension cannot find Julia, completely quit VS Code with **Command–Q** and reopen it. If automatic detection still fails, run `which julia` in `zsh` and use the returned executable location for the extension’s `julia.executablePath` setting.
 
 - If macOS displays a permission request immediately after an action you initiated, read the request and confirm that it names the expected application, folder, or process. Do not approve an unrelated or unexplained request merely to continue.
 
 - If several `zsh` entries appear, they are separate terminal sessions. Select each from the terminal list, retain the one you need, and remove extras with their trash-can buttons.
 
-- If Outline is absent, keep the `.qmd` file active, run `View: Open View` from the Command Palette, and select `Outline`.
-
-- If visual editing commands are absent, confirm that `quarto.quarto` is installed and enabled and that the active file ends in `.qmd`.
-
-- If no **Run Cell** control appears, select only the Julia statements and run `Julia: Execute Code in REPL` from the Command Palette.
-
-- If Quarto requests a Jupyter kernel when rendering the practice document, confirm that `engine: julia` is present in its YAML. Without that setting, Quarto retains the older Jupyter engine as its default for Julia code.
-
-- If the first Julia-engine preview pauses while installing `QuartoNotebookRunner.jl`, allow that installation to finish. A later preview should not require the same initial setup unless the private environment needs to be rebuilt.
-
 - If Julia syntax is highlighted but no expression has run successfully, continue verification. Highlighting confirms language recognition, not the presence of a working runtime.
+
+- If `Sys.ARCH` does not report `aarch64` on a Mac with Apple silicon, review the Julia installation before proceeding.
 
 ## Summary
 
-In this chapter, you installed and verified Julia, identified and tested the Julia and Quarto VS Code extensions, and created a Julia-enabled Quarto practice document. You used the Command Palette to locate actions, the Explorer to create files and folders, the Outline to navigate headings, and the terminal-session list to switch between `zsh` and the Julia REPL. You then executed the same Julia statements interactively in the visible REPL and reproducibly through Quarto’s Julia engine. These checks provide observable evidence that the tools are installed, connected, and executing code rather than merely recognizing Julia syntax.
+In this chapter, you installed and opened VS Code, installed Julia with juliaup, and installed the Julia VS Code extension. You used the Command Palette and integrated terminal, distinguished the terminal panel from the sessions inside it, and verified the Julia installation from an ordinary `zsh` shell. You then started the integrated Julia REPL, evaluated `6 * 7`, inspected the installed Julia version, and ended the Julia and shell sessions deliberately. These checks provide observable evidence that VS Code, the Julia extension, and the Julia runtime are installed and communicating.
 
-## Chapter terms
+## Chapter Terms {#chapter-terms}
 
-**Code chunk**: A fenced block in a Quarto document that contains code. A language name inside braces, such as `{julia}`, marks the block as executable during rendering.
+**Activity Bar**: The vertical group of icons used to switch among major VS Code views.
 
 **Command Palette**: VS Code’s searchable menu of built-in and extension-provided actions. On a Mac, open it with **Shift–Command–P**.
 
-**Execution engine**: The software layer Quarto uses to run executable code while producing a document. This chapter explicitly selects Quarto’s Julia engine.
+**Explorer**: VS Code’s file-navigation view for opening, creating, renaming, and organizing folders and files.
 
-**Explorer**: VS Code’s file-navigation view for opening, creating, renaming, and organizing the folders and files in the active workspace.
+**Extension**: An add-on that expands VS Code’s capabilities. An extension can connect the editor to other installed software but does not replace that software.
 
-**Extension**: An add-on that expands VS Code’s capabilities. Extensions can connect the editor to other installed software but do not replace that software.
+**Extensions View**: The VS Code view used to search for, install, inspect, enable, and remove extensions.
 
-**Integrated terminal**: The terminal panel built into VS Code. It can contain multiple terminal sessions.
+**Integrated Terminal**: The terminal panel built into VS Code. It can contain multiple terminal sessions.
 
 **Julia REPL**: Julia’s interactive Read–Eval–Print Loop, which reads an expression, evaluates it, prints the result, and waits for another instruction. It is roughly analogous to the R Console in RStudio.
 
-**Julia runtime**: The installed software that interprets and executes Julia code.
+**Julia Runtime**: The installed software that interprets and executes Julia code.
 
-**Julia VS Code extension**: The extension that connects VS Code to the Julia runtime and provides Julia-aware commands, code completion, help, and an integrated REPL.
+**Julia VS Code Extension**: The extension that connects VS Code to the Julia runtime and provides Julia-aware commands, code completion, help, and an integrated REPL.
 
-**juliaup**: The Julia project’s recommended installer and version manager for installing, updating, and selecting Julia versions.
+**juliaup**: Julia’s recommended installer and version manager for installing, updating, and selecting Julia versions.
 
-**Minimap**: The compressed overview shown on the right side of the editor. It supports visual movement through a long file but is not a readable heading list.
+**PATH**: A list of directories the shell searches when locating an executable command such as `julia`.
 
-**Outline**: The Explorer view that displays the heading or symbol hierarchy of the active file and allows direct navigation to a section.
+**Shell**: A command interpreter that runs inside a terminal session and accepts operating-system commands.
 
-**PATH**: A list of directories the shell searches when locating an executable command such as `julia` or `quarto`.
+**Status Bar**: The area at the bottom of VS Code that displays information about the current context.
 
-**Quarto VS Code extension**: The extension that supplies Quarto-aware source editing, visual editing, code-cell controls, and preview commands in VS Code.
+**Terminal Session**: One running shell, REPL, task, or other program listed inside VS Code’s integrated terminal panel.
 
-**Shell**: A command interpreter that runs inside a terminal session and accepts operating-system commands. The default shell on a current Mac is usually `zsh`.
+**Visual Studio Code (VS Code)**: A general-purpose code editor that can be extended to support different programming languages and workflows.
 
-**Source editor**: The editing view that exposes the literal YAML, Markdown, attributes, and code fences stored in a `.qmd` file.
-
-**Terminal session**: One running shell, REPL, task, or other program listed inside VS Code’s integrated terminal panel.
-
-**Visual editor**: Quarto’s formatted editing view for working with the content of a `.qmd` file without displaying all of its underlying Markdown syntax.
+**zsh**: The default shell on current versions of macOS. It accepts operating-system commands at a prompt that usually ends with `%`.
