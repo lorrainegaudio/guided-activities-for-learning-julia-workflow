@@ -1,6 +1,6 @@
 ---
-title: "Rules and State"
-subtitle: "Functions, decisions, repetition, randomness, and changing state"
+title: "Chapter 4"
+subtitle: "Rules and State"
 toc: true
 ---
 

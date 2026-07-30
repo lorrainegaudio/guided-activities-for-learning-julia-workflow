@@ -1,200 +1,258 @@
 ---
-title: "Julia Literacy"
-engine: julia
+title: "Chapter 3"
+subtitle: "Julia Literacy"
 toc: true
 ---
 
 ## Overview
 
-Data analysts need to connect code with the values it creates, the operations it performs, and the results it displays. RStudio makes some of these relationships visible through the Console and Environment pane. Julia and VS Code support a similar exploratory workflow through the Julia REPL, the Julia extension's Workspace view, the editor, and rendered Quarto output. This chapter uses familiar ideas from R to develop the Julia literacy needed to store and inspect values, call functions, work with vectors, retrieve elements, and read the short calculations that will later describe a changing population.
+In Chapter 2, we opened a project folder in VS Code, created `navigation_practice.jl`, and added DataFrames.jl to the Julia project environment. In this chapter, we will reopen that project and continue working in the same Julia script.
 
-**After working through this chapter, you will be able to:**
+Learning a programming language involves learning how to read its small building blocks. We will begin with names and values, calculations, comparisons, functions, vectors, and common types. We will also use the DataFrames.jl package that we added in Chapter 2. Rather than installing another package or downloading a dataset, we will create a small dataset of our own and learn how to inspect it.
 
-- Store, inspect, and replace values in a Julia session.
-- Distinguish assignment with `=` from comparison with `==`.
-- Recognize a function call, identify its arguments, and use Julia's help mode.
-- Recognize selected Julia values and types.
-- Create, inspect, and summarize a Julia vector.
-- Retrieve vector elements using one-based indexing and ranges.
-- Recognize the punctuation and spacing used in simple Julia code.
-- Apply an operation to each element of a vector.
-- Install, load, and use a Julia package in a Quarto project.
-- Read and explain a short sequence of Julia expressions representing a population.
+If you have used R, many ideas in this chapter will feel familiar. Julia and R both let us store values, call functions, work with vectors, and organize data in tables. The notation is sometimes different, however, and those differences matter. The comparisons with R are meant to help you notice what transfers and what changes.
 
-## Create a Julia literacy practice document
+By the end of this chapter, you will be able to:
 
-In the previous chapter, you created a Julia-enabled Quarto practice document and used it to connect VS Code, Julia, and Quarto. You will use a new practice document to record the code and observations from this chapter. Keeping the activities in a saved document makes it possible to rerun them, render them, and return to your notes after the Julia session ends.
+- store, inspect, and replace values in a Julia script;
+- distinguish assignment with `=` from comparison with `==`;
+- identify a function call and its arguments and use Julia's help mode;
+- recognize several common Julia types;
+- create, inspect, and summarize a vector;
+- retrieve values using one-based indexing and ranges;
+- recognize common Julia syntax, including broadcasting with dot operators;
+- load DataFrames.jl and create and inspect a small DataFrame; and
+- read a short sequence of Julia instructions as a model of a population.
 
-**Goal:** Create a Julia-enabled Quarto document for the chapter activities.
+## Reopen the project and Julia script
 
-1. Open the Explorer in VS Code.
-2. Select the `practice` folder created in the previous chapter.
-3. Create a file named:
+Chapter 2 left us with three important files in the project folder:
 
 ```text
-julia-literacy-practice.qmd
+my-julia-project/
+├── Project.toml
+├── Manifest.toml
+└── navigation_practice.jl
 ```
 
-4. Enter the following content:
+The [`navigation_practice.jl` file]{.glossary-term data-term="Julia Script"} stores the Julia code we wrote. `Project.toml` and `Manifest.toml` describe the [project environment]{.glossary-term data-term="Project Environment"}, including the packages available to the script.
 
-````markdown
----
-title: "Julia Literacy Practice"
-format: html
-engine: julia
----
+**Goal:** Reopen the project from Chapter 2 and confirm that its script and package environment are available.
 
-## Store and inspect values
+1. Open VS Code.
+2. Choose **File > Open Recent** and select the project folder you used in Chapter 2.
+3. If the folder is not listed, choose **File > Open Folder** and locate it on your computer.
+4. In the Explorer, confirm that you can see `navigation_practice.jl`, `Project.toml`, and `Manifest.toml`.
+5. Select `navigation_practice.jl` to open it in the editor.
+6. Open the Command Palette and run **Julia: Start REPL**.
 
-This document records my Julia Literacy practice and observations.
-````
+At the `julia>` prompt, enter:
 
-5. Save the file with **Command-S**.
-6. Preview the document with the **Quarto: Preview** command or from a `zsh` terminal:
-
-```bash
-quarto preview practice/julia-literacy-practice.qmd
+```julia
+pwd()
 ```
 
-**Check:** The Explorer should show `julia-literacy-practice.qmd` inside the `practice` folder. The preview should open an HTML document titled *Julia Literacy Practice* and display the **Store and inspect values** heading.
+The result should be the path to the project folder you opened. Now activate the environment stored in that folder:
 
-**Reflect:** The `.qmd` file preserves the code and written observations saved in the document. It does not preserve every temporary value held by an interactive Julia session. Saved code can recreate those values the next time it runs.
+```julia
+import Pkg
+Pkg.activate(".")
+```
+
+The period means “the current folder.” Activating the environment tells Julia to use the packages recorded in this project's `Project.toml` and `Manifest.toml` files.
+
+With `navigation_practice.jl` active in the editor, open the Command Palette and run **Julia: Execute File in REPL**. The table created in Chapter 2 should appear in the REPL:
+
+```text
+2×2 DataFrame
+ Row │ language  extension
+     │ String    String
+─────┼─────────────────────
+   1 │ R         .R
+   2 │ Julia     .jl
+```
+
+Your spacing may differ slightly. What matters is that the file runs and displays two rows of data.
+
+**Check:** The Explorer shows the script and the two environment files. Running the script displays the small table from Chapter 2 without a package error.
+
+**Reflect:** The folder keeps the code and its package environment together. Reopening the folder therefore restores the context in which the script was written.
+
+For the rest of the chapter, add each new example beneath the existing code in `navigation_practice.jl`. Save the file after each section. To try only the new lines, select them and run **Julia: Execute Code in REPL** from the Command Palette. At natural stopping points, run the entire file again with **Julia: Execute File in REPL**. The [Julia extension documentation](https://www.julia-vscode.org/docs/stable/userguide/runningcode/) describes these ways of running code in VS Code.
 
 ## Store and inspect a first value
 
-In R, assigning a value to a name creates an object that can be inspected in RStudio's Environment pane. Julia describes this relationship as binding a name to a value. The Julia extension's Workspace view provides a way to inspect values held by the integrated Julia REPL.
+A [name]{.glossary-term data-term="Name"} lets us refer to a value later. In R, we often call a named value an object and assign it with `<-`. Julia usually uses `=` for [assignment]{.glossary-term data-term="Assignment"}.
 
-A **value** is information Julia can work with. A **name** lets later code refer to that value. An **assignment** uses `=` to bind the name on the left to the value calculated on the right.
+Add these lines beneath the code already in `navigation_practice.jl`:
 
-**Goal:** Store one value and find it in the Julia Workspace view.
-
-Add the following executable chunk to `julia-literacy-practice.qmd`:
-
-````markdown
-```{julia}
+```julia
+# Store and inspect a first value
 adopters = 3
+adopters
 ```
-````
 
-Save the document. Start the integrated Julia REPL with **Julia: Start REPL** if it is not already running. Place the cursor in the chunk and select **Run Cell**. If the control does not appear, select the Julia statement and run **Julia: Execute Code in REPL** from the Command Palette.
+Select the two lines of code and run them in the REPL. 
 
-Open the Julia view from the Activity Bar and expand its **Workspace** section. Look for `adopters`.
+- Control + Enter: Runs the highlighted lines in the Julia REPL. Use Control, not Command.
+- Play triangle: Runs the entire active .jl file.
+- You can also open the Command Palette and choose Julia: Execute Code in REPL.
 
-**Check:** The Julia REPL should display `3`. The Workspace view should list `adopters` with the value `3`. These observations establish that the assignment ran in the integrated Julia session.
+Julia stores the integer `3` under the name `adopters`, and evaluating the name displays its current [value]{.glossary-term data-term="Value"}:
 
-If the rendered HTML displays `3` but `adopters` does not appear in the interactive Workspace view, identify how the code was run. Quarto uses a separate Julia worker when it renders the document. Running the cell through the Julia extension sends the code to the integrated REPL whose state appears in the Workspace view.
+```text
+3
+```
 
-**Reflect:** The Julia Workspace view is similar to RStudio's Environment pane because it shows names and values in a running language session. It is different from the VS Code **workspace**, which is the project folder open in the editor. The same word refers to two different layers of the workflow.
+You can also open the Julia **Workspace** pane in VS Code. The [Workspace view]{.glossary-term data-term="Workspace View"} shows names defined in the current Julia session and the values associated with them. Look for `adopters` and confirm that its value is `3`.
+
+The comparison with R is direct:
+
+| Purpose | R | Julia |
+|---|---|---|
+| Store a value | `adopters <- 3` | `adopters = 3` |
+| Inspect a value | `adopters` | `adopters` |
+
+**Check:** Entering `adopters` at the REPL displays `3`, and `adopters` appears in the Workspace view.
+
+**Reflect:** The script is the saved record of the instruction. The REPL and Workspace show the state created when that instruction runs.
+
+### Inspect the value in the Julia Workspace
+
+The [Julia Workspace]{.glossary-term data-term="Julia Workspace"} is similar to the Environment pane in RStudio. It shows the names and values currently available in the Julia session.
+
+Look at the **Activity Bar**, the narrow vertical strip of icons along the far-left edge of the VS Code window. The Explorer icon that you used to view your files is near the top of this strip. Farther down, locate the **Julia icon**, which looks like a small cluster of three circles. Hover over the icon to confirm that its label is **Julia**, and then select it.
+
+The Julia sidebar will open where the Explorer normally appears. Find the heading **Workspace** in this sidebar. If the Workspace is collapsed, select the small right-pointing arrow beside the heading. The arrow will point downward when the pane is expanded.
+
+The Workspace may organize values beneath the heading **Main**, which is the module in which our code is running. If necessary, expand **Main** as well. Find `adopters` in the list and confirm that its value is `3`.
+
+If the Julia icon is not visible, right-click an empty area of the Activity Bar and make sure **Julia** is selected in the menu.
+
+Like RStudio’s Environment pane, the Julia Workspace displays values held in the current programming session. It does not save those values permanently. The `.jl` script preserves the instructions needed to create them again.
+
+**Check:** The Julia Workspace lists `adopters` with the value `3`.
 
 ## Calculate with a stored value
 
-An **expression** is code that Julia evaluates to obtain a value. An expression can calculate a result without storing that result under a new name.
+Once a value has a name, we can use that name in a calculation. Add and run:
 
-**Goal:** Calculate a new result without replacing the stored value.
-
-Add this chunk below the first chunk:
-
-````markdown
-```{julia}
+```julia
+# Calculate with a stored value
 adopters + 2
 ```
-````
 
-Run the chunk interactively, then inspect `adopters` in the Workspace view.
+Julia evaluates the [expression]{.glossary-term data-term="Expression"} and displays:
 
-**Check:** The Julia REPL should display `5`, while the Workspace view should continue to show `adopters` with the value `3`. Julia calculated a result but did not assign that result to a name.
+```text
+5
+```
 
-**Reflect:** The same distinction appears in R. Entering `adopters + 2` in the R Console displays a result but does not change the object stored under `adopters`.
+The value stored under `adopters` is still `3`. The expression calculates a result but does not assign that result to a name.
+
+**Check:** Enter `adopters` again. It should still display `3`.
+
+**Reflect:** A calculation can produce a result without changing the values used to calculate it.
 
 ## Replace and compare values
 
-Assignment and comparison use similar-looking operators for different purposes:
+To keep the result of a calculation, assign it to a name. Add and run:
 
-- `=` performs **assignment**. For an R user, it serves the role commonly served by `<-`.
-- `==` performs a **comparison**. It asks whether two values are equal.
-
-A comparison produces a **Boolean** value. Julia writes the two Boolean values as lowercase `true` and `false`; R commonly displays uppercase `TRUE` and `FALSE`.
-
-**Goal:** Replace the value associated with a name and test the new value with comparisons.
-
-Add the following chunk:
-
-````markdown
-```{julia}
+```julia
+# Replace and compare values
 adopters = adopters + 2
-
 adopters == 3
 adopters == 5
 ```
-````
 
-Run the assignment first and inspect the Workspace view. Then run each comparison.
+The first line reads the current value of `adopters`, adds `2`, and assigns the result back to the same name. The next two lines make a [comparison]{.glossary-term data-term="Comparison"}. Julia should display `false` and then `true`.
 
-**Check:** The Workspace view should show `adopters` with the new value `5`. The comparison `adopters == 3` should produce `false`, and `adopters == 5` should produce `true`.
+This distinction is important:
 
-**Reflect:** The assignment changed the value associated with `adopters`. The comparisons inspected that value without changing it. In both R and Julia, a calculation changes stored state only when its result is assigned.
+| Symbol | Meaning | Example |
+|---|---|---|
+| `=` | Assign a value | `adopters = 5` |
+| `==` | Ask whether two values are equal | `adopters == 5` |
+
+The words `true` and `false` are [Boolean values]{.glossary-term data-term="Boolean"}. R uses the uppercase values `TRUE` and `FALSE`; Julia uses lowercase.
+
+**Check:** `adopters` now has the value `5`, and `adopters == 5` returns `true`.
+
+**Reflect:** Assignment changes the state of the Julia session. Comparison asks a question about that state.
 
 ## Call functions and use Julia help
 
-A **function** is a named operation. A **function call** places parentheses after the function name. Values supplied inside the parentheses are the function's **arguments**.
+A [function]{.glossary-term data-term="Function"} is a named operation. A [function call]{.glossary-term data-term="Function Call"} places parentheses after the function's name. Values supplied inside the parentheses are called [arguments]{.glossary-term data-term="Argument"}.
 
-For example, `typeof()` reports the type of a supplied value. In `typeof(adopters)`, `typeof` names the function and `adopters` is its argument.
+Add and run:
 
-**Goal:** Call a function and use Julia's help mode to investigate it.
-
-Add this chunk:
-
-````markdown
-```{julia}
+```julia
+# Call a function
 typeof(adopters)
 ```
-````
 
-Run the chunk. Then move to the Julia REPL, enter the following at the beginning of the `julia>` prompt, and press **Return**:
+Here, `typeof` is the function and `adopters` is its argument. Julia should return:
 
 ```text
+Int64
+```
+
+This tells us that `adopters` currently contains a 64-bit integer.
+
+In the Julia REPL, click after `julia>`, type `?`, and press Return. At the new `help?>` prompt, type:
+
+```julia
 ?typeof
 ```
 
-The prompt changes to Julia's help mode and displays documentation for `typeof`. Press **Backspace** at an empty help prompt to return to `julia>`.
+The prompt changes to `help?>`, and Julia displays documentation for `typeof`. Press Backspace at an empty help prompt to return to `julia>`.
 
-**Check:** On a 64-bit system, `typeof(adopters)` should display `Int64`. Help mode should display a description of `typeof` and examples of its use.
+Functions may take one argument or several. For example:
 
-**Reflect:** R also provides `typeof()` and allows `?typeof` to request help. The syntax therefore looks familiar, although Julia presents help inside the REPL rather than in RStudio's Help pane.
+```julia
+abs(-4)
+```
 
-An unfamiliar function should be explained before it is used. For example, `abs()` returns the absolute value of a number, or its distance from zero without regard to sign. `abs(-4)` therefore returns `4`. R provides a function with the same name and purpose.
+The function `abs` receives the argument `-4` and returns its absolute value, `4`.
+
+**Check:** You can identify the function and argument in `typeof(adopters)` and open the function's documentation from the REPL.
+
+**Reflect:** Reading unfamiliar Julia code often begins by identifying function calls and then checking what those functions do.
 
 ## Distinguish printed and displayed results
 
-The Julia REPL and Quarto can display the result of an evaluated expression. A function such as `println()` explicitly prints output. The name `println` indicates that the function prints its arguments and then starts a new line.
+The REPL displays the result of an expression that you ask it to evaluate. A program can also print a message deliberately with `println`.
 
-**Goal:** Distinguish output printed by a function from a value displayed after evaluation.
+Add and run these lines together:
 
-Add this chunk:
-
-````markdown
-```{julia}
+```julia
+# Print and display results
 println("Current number of adopters: ", adopters)
 adopters
 ```
-````
 
-The first function call supplies two arguments separated by a comma: a text label and the value associated with `adopters`. The final expression asks Julia to display that value by itself.
+The first line prints a sentence:
 
-**Check:** The output should contain the printed line `Current number of adopters: 5` followed by the displayed value `5`.
+```text
+Current number of adopters: 7
+```
 
-**Reflect:** Printed output is produced deliberately by a function such as `println()`. A displayed result is the environment's representation of a value after an expression is evaluated. This resembles the difference in R between explicitly printing an object and allowing the Console or a rendered document to display a final expression.
+The second line evaluates the name, so the REPL also displays its value:
+
+```text
+7
+```
+
+A [displayed result]{.glossary-term data-term="Displayed Result"} is produced by the tool that evaluates an expression. Printed output is produced because the code explicitly calls a printing function. This difference becomes useful when a script contains many calculations but should report only selected results.
+
+**Check:** You can explain which line produces the sentence and which line evaluates to the number `7`.
 
 ## Recognize common values and types
 
-Values that look different may also have different Julia types. For this chapter, the most useful distinctions are among whole numbers, numbers containing decimal points, text, and Boolean values.
+A [type]{.glossary-term data-term="Type"} describes how Julia represents a value and what operations can be performed with it. Add and run:
 
-**Goal:** Store several kinds of values and inspect their types.
-
-Add the following chunk:
-
-````markdown
-```{julia}
+```julia
+# Recognize common values and types
 population_size = 20
 adoption_rate = 0.35
 group_name = "North"
@@ -205,282 +263,323 @@ typeof(adoption_rate)
 typeof(group_name)
 typeof(has_adopted)
 ```
-````
 
-Run each `typeof()` expression and compare its result with the value supplied as the argument.
+You should see four types:
 
-**Check:** Julia should report `Int64` for `population_size`, `Float64` for `adoption_rate`, `String` for `group_name`, and `Bool` for `has_adopted`.
+| Kind of value | typeof| Julia example |
+|---|---|---|
+| Integer-like number | Int64 | `20` |
+| Decimal number | Float64 | `0.35` |
+| Text | String | `"North"` |
+| Boolean | Bool | `true` |
 
-**Reflect:** R and Julia both distinguish kinds of values, although the type names and internal representations are not always identical. At this stage, the useful skill is recognizing why Julia treats a value as a whole number, a decimal number, text, or a logical value.
+In Julia, `20` is an integer by default. In R, a number written as `20` is usually stored as a double unless it is written as `20L`.
+
+**Check:** The four names appear in the Workspace view with values and types that match the examples above.
+
+**Reflect:** Types are not merely labels. They help Julia determine how a value should behave in later operations.
 
 ## Create and inspect vectors
 
-A **vector** is a one-dimensional ordered collection of elements. R commonly constructs a vector with `c(...)`. Julia constructs a vector by placing comma-separated elements inside square brackets.
+A [vector]{.glossary-term data-term="Vector"} is a one-dimensional collection of values. R commonly creates a vector with `c()`. Julia uses square brackets with commas between the [elements]{.glossary-term data-term="Element"}.
 
-Compare the two forms:
-
-```r
-# R
-adoption_counts <- c(3, 5, 4)
-```
+Add and run:
 
 ```julia
-# Julia
-adoption_counts = [3, 5, 4]
-```
-
-In Julia array notation, commas and spaces can carry different meanings. `[3, 5, 4]` is a vector. `[3 5 4]`, without commas, is a one-row matrix. Use commas when constructing the vectors in this chapter.
-
-Several small functions help inspect a vector:
-
-- `length()` reports the number of elements.
-- `first()` returns the first element.
-- `last()` returns the last element.
-- `sum()` adds the elements.
-
-**Goal:** Create numeric and Boolean vectors and inspect their contents.
-
-Add this chunk:
-
-````markdown
-```{julia}
+# Create and inspect vectors
 adoption_counts = [3, 5, 4]
 adopted = [false, true, false, true]
 
+adoption_counts
 length(adoption_counts)
-first(adoption_counts)
-last(adoption_counts)
-sum(adoption_counts)
-sum(adopted)
+typeof(adoption_counts)
 ```
-````
 
-Julia's Boolean values participate in integer arithmetic as `1` for `true` and `0` for `false`. In this bounded example, `sum(adopted)` therefore counts the `true` elements.
+Julia should report that `adoption_counts` contains three values and has a type similar to `Vector{Int64}`. The part inside braces identifies the type of its elements.
 
-**Check:** The numeric vector should have length `3`, first element `3`, last element `4`, and sum `12`. The Boolean vector contains two `true` elements, so `sum(adopted)` should return `2`.
+| Purpose | R | Julia |
+|---|---|---|
+| Create a numeric vector | `c(3, 5, 4)` | `[3, 5, 4]` |
+| Find its length | `length(x)` | `length(x)` |
+| Inspect its type | `typeof(x)` | `typeof(x)` |
 
-Run the chunk interactively and inspect both vectors in the Workspace view. Depending on the available space, the view may show the elements directly or provide a control for expanding the value.
+The commas matter. In Julia, `[3, 5, 4]` is a vector, while `[3 5 4]` is a one-row matrix.
 
-**Reflect:** R and Julia both store vector elements in a defined order and provide functions such as `length()` and `sum()`. The main visible difference here is the constructor: `c(...)` in R and comma-separated square brackets in Julia.
+**Check:** The Workspace view shows `adoption_counts` as a three-element integer vector and `adopted` as a four-element Boolean vector.
 
 ## Retrieve values with one-based indexing
 
-An **index** identifies a position in an ordered collection. Julia and R both use one-based indexing for ordinary vectors, so position `1` refers to the first element.
+An [index]{.glossary-term data-term="Index"} identifies a position in a collection. Like R, Julia uses one-based indexing: the first element is at position `1`.
 
-A **range** represents consecutive values. The Julia expression `2:4` includes `2`, `3`, and `4`.
+Add and run:
 
-**Goal:** Retrieve one vector element or a consecutive subset.
-
-Add this chunk:
-
-````markdown
-```{julia}
+```julia
+# Retrieve values with one-based indexing
 adopted[1]
 adopted[2]
 adopted[2:4]
 ```
-````
 
-Square brackets now follow an existing name rather than constructing a new vector. `adopted[2]` retrieves one element from `adopted`; `adopted[2:4]` retrieves the elements at three consecutive positions.
+Square brackets retrieve values from the vector. The [range]{.glossary-term data-term="Range"} `2:4` represents the positions `2`, `3`, and `4`.
 
-**Check:** The first expression should return `false`, the second should return `true`, and the range should return `[true, false, true]`.
+You should see:
 
-**Reflect:** The expressions `adopted[1]` and `adopted[2:4]` use the same one-based positions an R user would expect. This shared indexing convention reduces the amount of translation required when moving between the languages.
+```text
+false
+true
+Bool[1, 0, 1]
+```
+
+Depending on how the result is displayed, Julia may show the last Boolean vector as `Bool[1, 0, 1]` or as the words `true` and `false` on separate lines. Both representations describe the same three Boolean values.
+
+**Check:** `adopted[1]` retrieves the first value, while `adopted[2:4]` retrieves three consecutive values.
+
+**Reflect:** One-based indexing is an important point of continuity between R and Julia.
 
 ## Apply an operation to every vector element
 
-R ordinarily applies arithmetic between a vector and a single number across the entire vector. Julia marks this elementwise intention by attaching a dot to an operator. Julia calls this process **broadcasting**.
+In Julia, a dot before an operator or function call indicates [broadcasting]{.glossary-term data-term="Broadcasting"}: apply that operation element by element.
 
-For example, `.+` applies addition element by element and `.*` applies multiplication element by element.
+Add and run:
 
-**Goal:** Recognize dotted arithmetic and predict the resulting vectors.
-
-Add this chunk:
-
-````markdown
-```{julia}
+```julia
+# Apply operations element by element
 adoption_counts .+ 1
 adoption_counts .* 2
 ```
-````
 
-**Check:** The original vector `[3, 5, 4]` should produce `[4, 6, 5]` after dotted addition and `[6, 10, 8]` after dotted multiplication. Because neither result is assigned to a name, `adoption_counts` should remain `[3, 5, 4]` in the Workspace view.
+The results are:
 
-**Reflect:** R would ordinarily write `adoption_counts + 1` and `adoption_counts * 2` without dots. Julia's dotted operators make the elementwise operation visible. Broadcasting can expand a single number across a vector, but it is not the same as R's general recycling behavior. Julia does not ordinarily cycle an arbitrary shorter vector until it matches a longer one.
+```text
+3-element Vector{Int64}:
+ 4
+ 6
+ 5
 
-For more detail, see Julia's official documentation for [vectorized dot operators](https://docs.julialang.org/en/v1/manual/mathematical-operations/#man-dot-operators).
+3-element Vector{Int64}:
+ 6
+ 10
+ 8
+```
 
-## Install a Julia package for the project
+R vectorizes many operations automatically, so `adoption_counts + 1` works element by element. Julia makes this intention visible with `.+` and `.*`. Julia's [mathematical operations documentation](https://docs.julialang.org/en/v1/manual/mathematical-operations/#man-dot-operators) explains dot operators in more detail.
 
-Julia packages extend the language with additional data structures, functions, and datasets. Installing and loading a Julia package resembles the corresponding R workflow:
+Broadcasting is not the same as R's recycling behavior. It follows Julia's rules for combining compatible shapes. For now, the important pattern is simple: the dot tells Julia to apply an operation across the elements of a collection.
 
-- `Pkg.add("RDatasets")` is similar to `install.packages("package.name")`. It adds the package to the active project environment.
-- `using RDatasets` is similar to `library(RDatasets)`. It loads the package for the current Julia session.
+**Check:** Adding `1` changes each result without changing the stored vector. Enter `adoption_counts` again and confirm that it is still `[3, 5, 4]`.
 
-Installation is normally required once for a project environment on a computer. Loading is required in each new Julia session and each reproducible Quarto render that uses the package.
+## Create a dataset with DataFrames.jl
 
-**Goal:** Add `RDatasets` to the book's Julia project environment so that the practice document can use a familiar R dataset.
+In Chapter 2, we added the [DataFrames.jl package]{.glossary-term data-term="DataFrames.jl"} to the project and placed `using DataFrames` at the beginning of the script. A [package]{.glossary-term data-term="Package"} is reusable code that adds tools to Julia. DataFrames.jl provides the `DataFrame` type and functions for working with rectangular data.
 
-Stop any active Quarto preview with **Control-C**. Return to the integrated Julia REPL and confirm that its working directory is the root folder of the book project. Enter the following statements at `julia>`, one line at a time:
+DataFrames.jl does not include a collection of example datasets. Instead of adding another package merely to obtain one, we will create a small [dataset]{.glossary-term data-term="Dataset"} that fits the subject of this book.
+
+Confirm that the first executable line of `navigation_practice.jl` is:
 
 ```julia
-import Pkg
-Pkg.activate(".")
-Pkg.add("RDatasets")
+using DataFrames
 ```
 
-`import Pkg` makes Julia's built-in package manager available. `Pkg.activate(".")` selects the project environment in the current folder. `Pkg.add("RDatasets")` adds RDatasets and the packages it requires.
+Then add and run:
 
-The first installation may download files and precompile packages. Wait until the ordinary `julia>` prompt returns before continuing.
+```julia
+# Create a small dataset
+adoption_data = DataFrame(
+    person = ["A", "B", "C", "D", "E", "F"],
+    group = ["North", "North", "North", "South", "South", "South"],
+    adopted = [false, true, false, true, true, false],
+    contacts = [2, 5, 3, 4, 6, 1],
+)
 
-**Check:** The installation should finish without an error. The Explorer should show a `Project.toml` file and a `Manifest.toml` file at the project root, or show that existing versions of those files were updated. These files record the project's direct dependencies and resolved package versions.
-
-**Reflect:** The package code is not stored inside the `.qmd` document. The project environment records which packages the document needs. If the project is opened on another computer, Julia can use those environment files to obtain compatible package versions.
-
-## Load and inspect `mtcars`
-
-The `RDatasets` package provides access to datasets distributed with R and several popular R packages. The familiar `mtcars` data lets you concentrate on the Julia workflow rather than learn an unfamiliar dataset at the same time.
-
-The package only needs to be installed once in the project environment, but `using RDatasets` belongs in the executable document. Quarto starts a Julia worker when it renders the document, and that worker must load the package before later code calls its functions.
-
-Quarto can render the document to HTML when the required package is installed in the environment and loaded before use.
-
-The functions in the next example have familiar purposes:
-
-- `dataset()` retrieves a named dataset from an R package collection.
-- `size()` reports the numbers of rows and columns.
-- `names()` reports the column names.
-- `first(mtcars, 5)` returns the first five rows.
-
-**Goal:** Load `mtcars`, inspect its structure, and render the result to HTML.
-
-Add this chunk to `julia-literacy-practice.qmd`:
-
-````markdown
-```{julia}
-using RDatasets
-
-mtcars = dataset("datasets", "mtcars")
-size(mtcars)
-names(mtcars)
-first(mtcars, 5)
-```
-````
-
-Save the practice document and preview it again:
-
-```bash
-quarto preview practice/julia-literacy-practice.qmd
+adoption_data
 ```
 
-**Check:** Quarto should render the document without a package error. `size(mtcars)` should report `32` rows and `12` columns. R's original `mtcars` contains 11 measurement columns; RDatasets also provides the vehicle model names as a `Model` column. The final result should display the first five rows.
+A [DataFrame]{.glossary-term data-term="DataFrame"} organizes values into rows and columns. Each named argument in this function call becomes a [column]{.glossary-term data-term="Column"}. Values at the same position across the columns form a [row]{.glossary-term data-term="Row"}. Because every column in this example has six elements, the resulting DataFrame has six rows.
 
-If the package loads in the interactive REPL but not during Quarto preview, confirm that `Project.toml` is at the book's project root and that the practice document is inside that project. Quarto's Julia engine searches from the document's folder upward for the nearest Julia project environment.
+The final comma after the `contacts` column is allowed in Julia. It makes it easier to add, remove, or reorder lines later.
 
-To inspect the table in the Julia Workspace view, run the chunk interactively after the package has loaded. The `mtcars` name should then appear in the integrated REPL's Workspace state. Rendering alone uses Quarto's separate Julia worker and does not place the value in the interactive REPL.
+The resulting table should resemble this one:
 
-**Reflect:** The R and Julia operations have closely related purposes:
+```text
+6×4 DataFrame
+ Row │ person  group   adopted  contacts
+     │ String  String  Bool     Int64
+─────┼────────────────────────────────────
+   1 │ A       North     false         2
+   2 │ B       North      true         5
+   3 │ C       North     false         3
+   4 │ D       South      true         4
+   5 │ E       South      true         6
+   6 │ F       South     false         1
+```
 
-| Purpose | R | Julia with RDatasets |
+**Check:** `adoption_data` appears in the Workspace view as a `DataFrame` with six rows and four columns.
+
+**Reflect:** A dataset does not have to come from a built-in collection. Creating a small table can make its structure easier to see because we know where every value came from.
+
+## Inspect the DataFrame
+
+Before analyzing a dataset, we should learn its shape, names, contents, and types. Add and run each of these expressions:
+
+```julia
+# Inspect the DataFrame
+size(adoption_data)
+names(adoption_data)
+first(adoption_data, 3)
+describe(adoption_data)
+```
+
+Each function answers a different question:
+
+| Question | Julia expression | Expected result |
 |---|---|---|
-| Install the package | `install.packages("RDatasets")` | `Pkg.add("RDatasets")` |
-| Load the package | `library(RDatasets)` | `using RDatasets` |
-| Inspect dimensions | `dim(mtcars)` | `size(mtcars)` |
-| Inspect names | `names(mtcars)` | `names(mtcars)` |
-| Inspect first rows | `head(mtcars, 5)` | `first(mtcars, 5)` |
+| How many rows and columns are there? | `size(adoption_data)` | `(6, 4)` |
+| What are the column names? | `names(adoption_data)` | `person`, `group`, `adopted`, `contacts` |
+| What do the first three rows look like? | `first(adoption_data, 3)` | A three-row DataFrame |
+| What are the columns' types and summaries? | `describe(adoption_data)` | One summary row per column |
+
+This workflow has close counterparts in R:
+
+| Purpose | R | Julia with DataFrames.jl |
+|---|---|---|
+| Create a table | `data.frame(...)` | `DataFrame(...)` |
+| Inspect dimensions | `dim(df)` | `size(df)` |
+| Inspect names | `names(df)` | `names(df)` |
+| Inspect first rows | `head(df, 3)` | `first(df, 3)` |
+| Summarize columns | `summary(df)` | `describe(df)` |
+| Retrieve a named column | `df$adopted` | `df.adopted` |
+
+The period in `adoption_data.adopted` selects a column by name. Add and run:
+
+```julia
+# Work with one column
+adoption_data.adopted
+sum(adoption_data.adopted)
+```
+
+The first expression retrieves the Boolean column. In a sum, Julia treats `true` as `1` and `false` as `0`, so the second expression counts the adopters and returns `3`.
+
+The [DataFrames.jl guide to basic operations](https://dataframes.juliadata.org/stable/man/basics/) provides more examples of inspecting and working with a DataFrame.
+
+**Check:** You can identify the dataset's dimensions, name its four columns, display its first three rows, and count three adopters.
+
+**Reflect:** Inspecting a dataset before analyzing it helps us check whether its structure matches our expectations.
 
 ## Read the syntax used so far
 
-The examples have introduced a bounded set of Julia punctuation. Its meaning depends on where it appears.
+Programming becomes easier when punctuation begins to carry meaning. The following symbols have appeared in this chapter:
 
-| Syntax | Meaning in this chapter |
+| Syntax | Meaning in the examples |
 |---|---|
-| `=` | Assign a value to a name. |
-| `==` | Compare two values for equality. |
-| `()` | Supply arguments in a function call or group an expression. |
-| `[]` | Construct a vector or retrieve indexed elements. |
-| `,` | Separate vector elements or function arguments. |
-| `:` | Construct a range such as `2:4`. |
-| `#` | Begin a comment, as in R. |
-| `.+`, `.*` | Apply an arithmetic operation element by element. |
+| `=` | Assign a value to a name |
+| `==` | Compare two values for equality |
+| `()` | Call a function or group its arguments |
+| `[]` | Create a vector or retrieve elements by position |
+| `,` | Separate values or arguments |
+| `:` | Create a range, as in `2:4` |
+| `.` | Select a named column or broadcast an operation, depending on context |
+| `#` | Begin a comment |
+| `.+` | Add element by element |
+| `.*` | Multiply element by element |
 
-Spaces around operators usually improve readability. Spaces inside an array literal require more care because `[3, 5, 4]` and `[3 5 4]` construct different shapes.
+Notice that the meaning of a symbol depends partly on where it appears. In `adoption_data.adopted`, the dot connects a table to a column name. In `adoption_counts .+ 1`, the dot changes addition into an element-by-element operation.
 
-A complete expression can occupy one line. Julia can continue reading when parentheses, brackets, or another incomplete structure continue across lines. Indentation makes relationships easier for a reader to see, but indentation does not replace Julia's structural keywords. The next chapter introduces multiline functions, conditions, loops, and the closing keyword `end`.
+**Check:** Return to the script and find one example of each symbol in the table.
 
 ## Read a small population calculation
 
-The chapter's final calculation uses a Boolean vector to represent four individuals. `true` means that an individual has adopted a practice, and `false` means that the individual has not.
+We can now combine several ideas in a short sequence. Add and run:
 
-**Goal:** Connect stored state, function calls, and calculated summaries in one short sequence.
-
-Add this chunk:
-
-````markdown
-```{julia}
+```julia
+# Calculate an adoption rate for a small population
 adopted = [false, true, false, true]
 population_size = length(adopted)
 adopter_count = sum(adopted)
 adoption_rate = adopter_count / population_size
 
 println("Population size: ", population_size)
-println("Adopter count: ", adopter_count)
+println("Number of adopters: ", adopter_count)
 println("Adoption rate: ", adoption_rate)
 ```
-````
 
-Read the calculation from top to bottom:
+Read the instructions from top to bottom:
 
-1. `adopted` stores the population's current adoption state.
-2. `length(adopted)` counts the individuals.
-3. `sum(adopted)` counts the `true` elements.
-4. Division calculates the proportion of adopters.
-5. The three `println()` calls label the results in the output.
+1. `adopted` records the adoption state of four people.
+2. `length(adopted)` counts the people represented in the vector.
+3. `sum(adopted)` counts the `true` values.
+4. Dividing the number of adopters by the population size calculates the adoption rate.
+5. The three `println` calls report the results.
 
-**Check:** The output should report a population size of `4`, an adopter count of `2`, and an adoption rate of `0.5`. The Workspace view should show the vector and the three calculated values when the chunk runs interactively.
+The output should be:
 
-**Reflect:** This code represents and summarizes a population, but the population does not yet change. The next chapter adds functions, decisions, repetition, randomness, and mutation to express a behavioral rule over time.
+```text
+Population size: 4
+Number of adopters: 2
+Adoption rate: 0.5
+```
+
+Run the entire script once more with **Julia: Execute File in REPL**. Earlier assignments are repeated in order, and the final values should appear in the Workspace view.
+
+**Check:** At the end of the script, `population_size` is `4`, `adopter_count` is `2`, and `adoption_rate` is `0.5`.
+
+**Reflect:** Even this small calculation separates three ideas: the state of each person, a count derived from those states, and a rate that describes the population. Agent-based models build on the same separation at a larger scale.
 
 ## Summary
 
-In this chapter, you created a Julia Literacy practice document and connected names in Julia code with values in the integrated REPL's Workspace view. You distinguished calculations from assignments and comparisons, called functions, used help mode, inspected common value types, created and indexed vectors, and interpreted elementwise dotted operations. You also added a package to the project's Julia environment, loaded a familiar dataset, and rendered the results through Quarto. These activities provide the vocabulary and observable checks needed to read the small population mechanisms developed in the next chapter.
+In this chapter, we reopened a Julia project and continued working in its existing `.jl` script. We stored and replaced values, distinguished assignment from comparison, called functions, used help mode, and recognized several common types. We created vectors, retrieved elements with one-based indexing, and applied operations through broadcasting.
 
-## Chapter terms
+We also returned to the DataFrames.jl package installed in Chapter 2. We created a small dataset, inspected its dimensions and columns, displayed its first rows, summarized it, and counted values in a Boolean column. These practices establish a useful habit: before analyzing or modeling data, inspect what you have and confirm that it means what you think it means.
 
-**Argument:** A value supplied to a function when the function is called.
+## Chapter Terms {#chapter-terms}
 
-**Assignment:** Binding a name to a value with `=`.
+**Argument**: A value supplied to a function when the function is called. In `typeof(adopters)`, `adopters` is the argument.
 
-**Boolean:** A logical value that is either `true` or `false` in Julia.
+**Assignment**: The act of associating a name with a value. Julia commonly uses `=` for assignment.
 
-**Broadcasting:** Applying an operation or function element by element across compatible values, commonly indicated with dotted syntax.
+**Boolean**: A type with two possible values, `true` and `false`.
 
-**Comparison:** An operation that examines a relationship between values and produces a Boolean result.
+**Broadcasting**: Applying an operation or function element by element across a collection. Julia commonly marks broadcasting with a dot, as in `.+`.
 
-**Displayed result:** A value shown by an interactive or document environment after it evaluates an expression.
+**Column**: A named vertical collection of values in a table. A DataFrame may contain columns of different types.
 
-**Element:** One value contained in a collection such as a vector.
+**Comparison**: An expression that asks about the relationship between values and returns a Boolean result. For example, `adopters == 5` asks whether two values are equal.
 
-**Expression:** Code that Julia evaluates to obtain a value.
+**DataFrame**: A rectangular table provided by DataFrames.jl in which named columns may contain different types of values.
 
-**Function:** A named operation that can be called with supplied arguments.
+**DataFrames.jl**: A Julia package for creating and working with tabular data.
 
-**Function call:** An expression that asks a function to operate on supplied arguments.
+**Dataset**: An organized collection of related observations or values used for inspection, analysis, or modeling.
 
-**Index:** A position used to retrieve an element from a collection.
+**Displayed Result**: A value shown by the tool that evaluates an expression, such as the Julia REPL. It is distinct from output deliberately produced by a printing function.
 
-**Name:** An identifier used to refer to a value.
+**Element**: One value contained in a collection such as a vector.
 
-**Package:** An installable collection of Julia code that adds data structures, functions, datasets, or other capabilities.
+**Expression**: Julia code that can be evaluated to produce a value.
 
-**Project environment:** The package requirements and resolved versions associated with a Julia project, recorded in `Project.toml` and `Manifest.toml`.
+**Function**: A named operation that accepts zero or more arguments and returns a result.
 
-**Range:** A compact representation of an ordered sequence, such as `2:4`.
+**Function Call**: An instruction that runs a function, usually by writing its name followed by parentheses containing any arguments.
 
-**Type:** A classification that describes how Julia represents and operates on a value.
+**Index**: A number or other selector used to identify a position in a collection. Julia begins positional indexing at `1`.
 
-**Value:** Information that Julia can store, inspect, or use in an operation.
+**Julia Script**: A plain-text file with the `.jl` extension that stores Julia instructions so they can be edited, saved, and run again.
 
-**Vector:** A one-dimensional ordered collection of elements.
+**Name**: A word used to refer to a value in Julia code.
 
-**Workspace view:** The Julia VS Code extension view that summarizes variables defined in the active Julia module. It is different from the VS Code workspace containing the project files.
+**Package**: Reusable Julia code that adds types, functions, or other tools to a project.
+
+**Project Environment**: The package context associated with a Julia project, described by `Project.toml` and, when present, `Manifest.toml`.
+
+**Range**: A compact representation of an ordered sequence of values, such as `2:4`.
+
+**Row**: A horizontal record in a table, formed by values at the same position across its columns.
+
+**Type**: A description of how Julia represents a value and which operations can be performed with it.
+
+**Value**: A piece of data represented in a program, such as a number, a string, a Boolean, or a vector.
+
+**Vector**: A one-dimensional collection of values.
+
+**Julia Workspace**: A pane provided by the Julia extension for VS Code that lists the names and values currently defined in the active Julia session. It is similar to the Environment pane in RStudio. The values remain available while the Julia session is running but are not permanently stored in the Workspace.
+
+**Workspace View**: The VS Code pane that shows names currently defined in the connected Julia session and the values associated with them.
