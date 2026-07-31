@@ -1,37 +1,1361 @@
 ---
 title: "Chapter 4"
 subtitle: "Rules and State"
+engine: julia
 toc: true
 ---
 
-This chapter introduces the Julia structures needed to turn a conceptual behavioral rule into an executable mechanism.
+## Overview
 
-## Planned learning outcomes
+In the previous chapter, a Boolean vector represented a population: `true` meant that a person had adopted a practice, and `false` meant that the person had not. The code could summarize the population, but nothing in the population changed.
 
-By the end of this chapter, you will be able to:
+This chapter turns that static representation into a small simulation. Imagine six participants in a community garden workshop. Two participants already use a pollinator-friendly planting practice. During each interaction, one participant observes another. A participant who has not adopted the practice may copy someone who has.
 
-1. Define and call a Julia function.
-2. Read multiline and abbreviated function definitions.
-3. Distinguish positional arguments from keyword arguments.
-4. Explain how a Julia function determines its returned value.
-5. Use `if`, `elseif`, and `else` to express a decision.
-6. Use a `for` loop to repeat an action.
-7. Combine comparisons and Boolean operators into a condition.
-8. Modify a mutable collection and interpret the `!` naming convention.
-9. Generate random values with an explicitly supplied random-number generator.
-10. Inspect a developing rule with `println`, `@show`, `typeof`, and small checks.
-11. Build and explain a miniature time-step simulation using Julia vectors and functions.
+This simple story provides the pieces of a model:
 
-## Planned scope
+- The Boolean vector stores the population's [state]{.glossary-term data-term="State"}.
+- A [behavioral rule]{.glossary-term data-term="Behavioral Rule"} determines when adoption can occur.
+- An [activation rule]{.glossary-term data-term="Activation Rule"} selects who observes whom.
+- A random draw represents chance.
+- A loop advances the model through a sequence of [time steps]{.glossary-term data-term="Time Step"}.
+- A history vector records how the population changes.
 
-The simulated population will be represented by a Boolean vector. `true` means that an individual has adopted a practice and `false` means that the individual has not. During each step, one individual observes another and may adopt. A loop repeats the rule and records the number of adopters.
+The chapter stays in ordinary Julia. Agents.jl will organize similar pieces in the next module, but the mechanism should be understandable before a framework manages it.
 
-The chapter remains in ordinary Julia rather than Agents.jl. Its pedagogical purpose is to make the mechanism understandable before a framework organizes it.
+**After working through this chapter, you will be able to:**
 
-## Culminating activity
+1. Define and call short-form and multiline Julia functions.
+2. Distinguish positional arguments, keyword arguments, and return values.
+3. Use `if`, `elseif`, `else`, comparisons, and Boolean operators to express a decision.
+4. Explain how a mutating function changes a vector and why its name conventionally ends in `!`.
+5. Generate random values with an explicitly supplied random-number generator.
+6. Use a `for` loop to repeat an interaction and record population state over time.
+7. Identify the state, behavioral rule, activation rule, chance process, time step, and output in a small stochastic simulation.
 
-The learner will predict the effect of a behavioral rule, run the vector-based simulation, inspect the adoption count over time, and explain which lines represent state, interaction, chance, and change.
+## Create a Rules and State practice document
 
-## Development note
+You will build the simulation in a new Quarto document. Each activity adds one piece to the same workflow, so run the chunks in order.
 
-This file is a planning stub for the complete guided chapter. O1 may revise the outcomes, examples, and lesson sequence as the chapter develops.
+**Goal:** Create a Julia-enabled practice document for the chapter.
+
+1. Open the Explorer in VS Code.
+2. Select the `practice` folder.
+3. Create a file named:
+
+```text
+rules-and-state-practice.qmd
+```
+
+4. Enter the following content:
+
+````markdown
+---
+title: "Rules and State Practice"
+format: html
+engine: julia
+---
+
+## Model a changing population
+
+This document develops a small model of practice adoption.
+````
+
+5. Save the file.
+6. Preview it with the **Quarto: Preview** command or from a `zsh` terminal:
+
+```bash
+quarto preview practice/rules-and-state-practice.qmd
+```
+
+**Check:** The Explorer should show `rules-and-state-practice.qmd` inside the `practice` folder. The preview should open an HTML document titled *Rules and State Practice*.
+
+**Reflect:** The practice document will preserve the model code, explanations, and rendered results. The model will be constructed in small pieces so that each new programming structure has an observable purpose.
+
+### Restart the Julia session
+
+If you have previously run code in the Julia session and want to start fresh, restart the session before continuing. This ensures that all variables and functions are cleared and that the environment is in a known state.
+
+If you have a `julia> ` prompt open in VS Code, you can restart the session typing `exit()` and then pressing Enter. This ends the Julia session and clears everything stored in it. 
+
+Open the Command Palette in VS Code with `Ctrl+Shift+P` (Windows/Linux) or `Cmd+Shift+P` (Mac) and select **Julia: Restart REPL**.
+
+## Represent the population state
+
+The chapter begins with the same representation used at the end of Julia Literacy. Each position in the vector represents one workshop participant. The value at that position records whether the participant has adopted the practice.
+
+**Goal:** Create the initial population and verify its size and adopter count.
+
+Add this executable chunk:
+
+````markdown
+```{julia}
+adopted = [false, true, false, false, true, false]
+
+population_size = length(adopted)
+adopter_count = sum(adopted)
+
+println("Population size: ", population_size)
+println("Initial adopters: ", adopter_count)
+```
+````
+
+**Check:** The output should report a population size of `6` and an initial adopter count of `2`.
+
+**Reflect:** The vector is the model's state because its current values describe the population at one moment. `sum(adopted)` is a derived measurement of that state. It can be recalculated after the vector changes.
+
+## Define a function for a derived value
+
+Chapter 3 introduced [function calls]{.glossary-term data-term="Function Call"}. A function call uses an existing function. A [function definition]{.glossary-term data-term="Function Definition"} creates a new function that can be called later.
+
+**Goal:** Define a reusable function that calculates the proportion of adopters.
+
+To make the parts of the definition visible, begin with Julia's multiline form. Add this chunk:
+
+````markdown
+```{julia}
+function adoption_rate(statuses)
+    sum(statuses) / length(statuses)
+end
+
+adoption_rate(adopted)
+```
+````
+
+The first four lines define the function:
+
+- `function` tells Julia that a function definition is beginning.
+- `adoption_rate` is the function's name.
+- `statuses` is a parameter: a temporary name for the value the function will receive.
+- `sum(statuses) / length(statuses)` is the [function body]{.glossary-term data-term="Function Body"}.
+- `end` closes the definition.
+
+The final line is the function call:
+
+```julia
+adoption_rate(adopted)
+```
+
+When this line runs, Julia supplies the existing vector `adopted` to the function. Inside this particular call, the parameter `statuses` refers to that vector:
+
+```text
+argument supplied in the call     parameter used inside the function
+adopted                         →  statuses
+```
+
+The parameter could have been named `x`:
+
+```julia
+function adoption_rate(x)
+    sum(x) / length(x)
+end
+```
+
+That version would perform the same calculation. However, `statuses` communicates what kind of value the function expects. The parameter's name does not require the caller to have an object with that name. The function can receive `adopted` or any other compatible vector.
+
+**Check:** The function call should return approximately:
+
+```text
+0.3333333333333333
+```
+
+Two of the six participants have adopted the practice, so the adoption rate is one-third.
+
+The function has one [positional argument]{.glossary-term data-term="Positional Argument"}. When the function is called, the first supplied value is matched with the first parameter in its definition.
+
+The calculated rate is also the function's [return value]{.glossary-term data-term="Return Value"}. Julia returns the value of a function's final evaluated expression unless execution reaches an explicit `return`.
+
+For comparison, the equivalent **R** definition and call would be:
+
+````markdown
+```{r}
+adoption_rate <- function(statuses) {
+  sum(statuses) / length(statuses)
+}
+
+adoption_rate(adopted)
+```
+````
+
+The Julia and R versions contain the same conceptual parts: a function name, a parameter, a body, and a later call that supplies an argument.
+
+Julia also provides a shorter assignment form for functions whose bodies contain only one expression:
+
+```julia
+adoption_rate(statuses) = sum(statuses) / length(statuses)
+```
+
+Here, the left side of `=` is a function signature, not an object name and not a function call. It tells Julia to define a function named `adoption_rate` with one parameter named `statuses`. The expression on the right becomes the function body.
+
+A call looks similar but does not contain `=`:
+
+```julia
+adoption_rate(adopted)
+```
+
+This time, Julia runs the function using `adopted` as the supplied argument.
+
+The short and multiline definitions perform the same calculation. Keep only the multiline definition in the practice document; the short version is shown for comparison.
+
+Julia's [functions documentation](https://docs.julialang.org/en/v1/manual/functions/) describes both definition forms and the final-expression return rule.
+
+**Reflect:** A function definition creates a reusable operation, while a function call applies that operation to a particular value. The parameter inside the definition is a placeholder; it does not limit the function to an object with that name. `adoption_rate()` can therefore summarize any compatible vector of adoption statuses.
+
+## Express a decision with a conditional
+
+A [conditional]{.glossary-term data-term="Conditional"} selects which code to evaluate based on one or more Boolean conditions. Julia uses `if`, `elseif`, and `else` to express alternatives and `end` to close the conditional.
+
+The adoption rate can be translated into a simple verbal description:
+
+- `0` means no one has adopted.
+- A value below `0.5` means adoption is still early.
+- A value from `0.5` up to, but not including, `1` means adoption is growing.
+- `1` means everyone has adopted.
+
+**Goal:** Define a multiline function that classifies the population's current adoption stage.
+
+Add this chunk:
+
+````markdown
+```{julia}
+function adoption_stage(adopted)
+    rate = adoption_rate(adopted)
+
+    if rate == 0
+        "No adoption yet"
+    elseif rate < 0.5
+        "Early adoption"
+    elseif rate < 1
+        "Growing adoption"
+    else
+        "Full adoption"
+    end
+end
+
+adoption_stage(adopted)
+```
+````
+
+**Check:** The current population has an adoption rate of one-third, so the function should return:
+
+```text
+"Early adoption"
+```
+
+Julia evaluates the conditions from top to bottom and uses the first branch whose condition is `true`. The final expression in `adoption_stage()` is the entire `if` block. The selected branch produces the function's return value.
+
+For comparison, the same function can be written in R:
+
+````markdown
+```{r}
+adoption_stage <- function(adopted) {
+  rate <- adoption_rate(adopted)
+
+  if (rate == 0) {
+    "No adoption yet"
+  } else if (rate < 0.5) {
+    "Early adoption"
+  } else if (rate < 1) {
+    "Growing adoption"
+  } else {
+    "Full adoption"
+  }
+}
+
+adoption_stage(adopted)
+````
+
+Both versions define a function, calculate the adoption rate, and evaluate conditions from top to bottom. The first condition that evaluates to `true` in Julia—or `TRUE` in R—determines the returned description.
+
+The structures are similar but not identical:
+
+| Purpose | R | Julia |
+|---|---|---|
+| Begin the function | `function(adopted) {` | `function adoption_stage(adopted)` |
+| Assign the rate | `rate <- adoption_rate(adopted)` | `rate = adoption_rate(adopted)` |
+| Begin a condition | `if (rate == 0) {` | `if rate == 0` |
+| Add another condition | `} else if (rate < 0.5) {` | `elseif rate < 0.5` |
+| Add a fallback | `} else {` | `else` |
+| Close the conditional | `}` | `end` |
+| Close the function | `}` | `end` |
+
+Julia does not require parentheses around a condition or braces around each branch. Instead, `end` closes both the conditional and the function, so this example contains two `end` statements.
+
+In both languages, the selected text is the final expression evaluated by the function, so it becomes the return value without an explicit `return`.
+
+Julia requires each condition to evaluate to `true` or `false`; the number `1` is not silently treated as `true`. Additional differences are documented in Julia’s official [guide for users coming from R](https://docs.julialang.org/en/v1/manual/noteworthy-differences/).
+
+**Reflect:** The conditional does not change the population. It interprets the current state and returns a description. This distinction between observing state and changing state will remain useful as the model grows.
+
+## Combine conditions into a behavioral rule {#combine-conditions}
+
+The garden-workshop rule contains two requirements:
+
+1. The observer has not already adopted the pollinator-friendly planting practice.
+2. The person being observed has adopted it.
+
+Chance adds a third requirement: a random draw must fall below the adoption probability.
+
+Julia uses [Boolean operators]{.glossary-term data-term="Boolean Operator"} to combine or reverse Boolean values:
+
+| Operator | Meaning | Example |
+|---|---|---|
+| `!` | not | `!observer_adopted` |
+| `&&` | and | `eligible && lucky_draw` |
+| `||` | or | `condition_a || condition_b` |
+
+The operator `&&` requires both conditions to be `true`. The operator `||` requires at least one condition to be `true`. 
+
+**Goal:** Define a function that decides whether one specified interaction produces adoption.
+
+Add this chunk:
+
+````markdown
+```{julia}
+function will_adopt(
+    observer_adopted,
+    model_adopted,
+    random_draw;
+    adoption_probability=0.4,
+)
+    eligible = !observer_adopted && model_adopted
+    lucky_draw = random_draw < adoption_probability
+
+    eligible && lucky_draw
+end
+
+println(will_adopt(false, true, 0.25; adoption_probability=0.4))
+println(will_adopt(false, true, 0.75; adoption_probability=0.4))
+println(will_adopt(true, true, 0.10; adoption_probability=0.4))
+```
+````
+
+The first three inputs are positional arguments:
+
+1. `observer_adopted`
+2. `model_adopted`
+3. `random_draw`
+
+The semicolon in the definition begins the [keyword arguments]{.glossary-term data-term="Keyword Argument"}. A keyword argument is supplied by name. Here, `adoption_probability` has a default value of `0.4`, but the caller can deliberately replace it.
+
+In R, the comparable function is:
+
+````markdown
+```{r}
+will_adopt <- function(
+  observer_adopted,
+  model_adopted,
+  random_draw,
+  adoption_probability = 0.4
+) {
+  eligible <- !observer_adopted && model_adopted
+  lucky_draw <- random_draw < adoption_probability
+
+  eligible && lucky_draw
+}
+
+will_adopt(FALSE, TRUE, 0.25, adoption_probability = 0.4)
+will_adopt(FALSE, TRUE, 0.75, adoption_probability = 0.4)
+will_adopt(TRUE, TRUE, 0.10, adoption_probability = 0.4)
+```
+````
+
+The R and Julia functions implement the same behavioral rule:
+
+1. The observer is eligible only when they have not adopted and the model has adopted.
+2. The random draw must be below the adoption probability.
+3. Adoption occurs only when both `eligible` and `lucky_draw` are true.
+
+The Boolean operators have the same meanings in both languages:
+
+| Meaning | Julia | R |
+|---|---|---|
+| Not | `!` | `!` |
+| Scalar and | `&&` | `&&` |
+| Scalar or | `||` | `||` |
+| Boolean values | `true`, `false` | `TRUE`, `FALSE` |
+
+Here, `&&` is appropriate because each condition produces one Boolean value. R also has `&` for element-by-element comparisons across vectors, but this function is deciding the outcome of one specified interaction.
+
+The languages differ in how they identify arguments with default values. Julia uses a semicolon to begin keyword arguments:
+
+```julia
+random_draw;
+adoption_probability=0.4
+```
+
+R does not use a semicolon or define a separate keyword-argument category here. Instead, `adoption_probability = 0.4` gives the argument a default value, and the caller may deliberately supply it by name:
+
+```r
+will_adopt(FALSE, TRUE, 0.25, adoption_probability = 0.4)
+```
+
+In both languages, omitting that argument causes the function to use the default value of `0.4`.
+
+**Check:** The three calls should return:
+
+```text
+true
+false
+false
+```
+
+The first observer is eligible and receives a sufficiently low random draw. The second observer is eligible but the draw is too high. The third observer has already adopted, so the interaction cannot produce a new adoption.
+
+The function uses a supplied number rather than generating a random number internally. That design allows the rule to be tested with known cases before chance is introduced.
+
+**Reflect:** The code translates a verbal rule into explicit conditions. Each returned result can be explained by tracing the observer's state, the model's state, the random draw, and the adoption probability.
+
+## Change state with a mutating function
+
+Julia arrays are mutable: their elements can be changed after the array is created. An [array]{.glossary-term data-term="Array"} is an ordered collection of elements arranged in one or more dimensions. Julia calls `Array` a type rather than a class.
+
+A `Vector` is a one-dimensional array. Therefore, the Boolean vector used here is an array, although it is neither a data frame nor a data table.
+
+**Before mutation:** Create the population state and inspect it.
+
+Add this chunk:
+
+````markdown
+```{julia}
+practice_state = [false, true, false]
+
+println("Initial state: ", practice_state)
+println("Type:          ", typeof(practice_state))
+```
+````
+
+The output should resemble:
+
+```text
+Initial state: Bool[0, 1, 0]
+Type:          Vector{Bool}
+```
+
+`Vector{Bool}` tells us that `practice_state` is a one-dimensional array containing Boolean values. The first and third participants have not adopted the practice, while the second participant has.
+
+Depending on the display context, Julia may show Boolean values as either `false` and `true` or `0` and `1`. Both displays represent the same values.
+
+A [mutation]{.glossary-term data-term="Mutation"} changes an existing object. Julia conventionally ends the name of a [mutating function]{.glossary-term data-term="Mutating Function"} with `!`. The exclamation point warns readers that calling the function may visibly change one or more supplied objects. Julia does not enforce this convention, so the function’s code and documentation still determine what it does.
+
+**Goal:** Define and call a function that changes one participant’s adoption state.
+
+**Code:** Add this chunk:
+
+````markdown
+```{julia}
+function adopt!(statuses, observer)
+    statuses[observer] = true
+    statuses
+end
+
+before = copy(practice_state)
+adopt!(practice_state, 1)
+```
+````
+
+In the function definition, `statuses` is a parameter: a temporary name for the vector supplied to the function. In this call:
+
+```julia
+adopt!(practice_state, 1)
+```
+
+`practice_state` is supplied as the value of `statuses`, and `1` is supplied as the value of `observer`. The assignment:
+
+```julia
+statuses[observer] = true
+```
+
+therefore changes the first element of `practice_state`.
+
+Before making that change, `copy(practice_state)` created a separate vector containing the same values. This preserves the earlier state under the name `before`. Without `copy()`, two names could refer to the same mutable vector, and the mutation would be visible through both names.
+
+**Check:** Print the preserved state and the mutated state in a separate chunk:
+
+````markdown
+```{julia}
+println("Before: ", before)
+println("After:  ", practice_state)
+```
+````
+
+The output should show:
+
+```text
+Before: Bool[0, 1, 0]
+After:  Bool[1, 1, 0]
+```
+
+The first participant’s value changed from `false` to `true`. The existing `practice_state` vector was modified; the function did not require the caller to assign a separate result back to that name.
+
+For comparison, a similar function can be written in base R:
+
+````markdown
+```{r}
+adopt <- function(statuses, observer) {
+  statuses[observer] <- TRUE
+  statuses
+}
+
+r_practice_state <- c(FALSE, TRUE, FALSE)
+r_practice_state <- adopt(r_practice_state, 1)
+
+r_practice_state
+```
+````
+
+The R code should return:
+
+```text
+[1]  TRUE  TRUE FALSE
+```
+
+The function bodies look similar, but the calls emphasize an important difference:
+
+```julia
+adopt!(practice_state, 1)
+```
+
+```r
+r_practice_state <- adopt(r_practice_state, 1)
+```
+
+The Julia function changes the supplied mutable vector directly. R usually behaves as though a vector is copied when it is modified inside a function, so the function returns the updated vector and the caller assigns that result back to `r_practice_state`.
+
+Julia’s function documentation describes this [argument-passing behavior](https://docs.julialang.org/en/v1/manual/functions/#Argument-Passing-Behavior) and the visibility of changes to mutable arrays.
+
+**Reflect:** `will_adopt()` decides whether change should occur; `adopt!()` performs the change. Keeping decision and mutation separate makes each part easier to test and explain.
+
+## Chance
+
+### Set Seed
+
+A [random-number generator]{.glossary-term data-term="Random-Number Generator (RNG)"} produces a sequence of pseudorandom values. The values are generated computationally, but they are useful for representing uncertain events.
+
+**Goal:** Create an explicit random-number generator and examine the object before using it.
+
+The relevant `Xoshiro` syntax is:
+
+```julia
+Xoshiro(seed)
+Xoshiro()
+```
+
+The two forms differ:
+
+- `Xoshiro(seed)` creates a generator initialized with a supplied seed.
+- `Xoshiro()` creates a generator using a seed obtained from the system.
+
+A [seed]{.glossary-term data-term="Seed"} initializes the generator’s internal state. We will supply a seed because it allows the sequence of draws to be repeated within the same software environment.
+
+**Code:** Add this chunk:
+
+````markdown
+```{julia}
+using Random
+
+rng = Xoshiro(2026)
+
+println("Type:      ", typeof(rng))
+println("Is an RNG: ", rng isa AbstractRNG)
+```
+````
+
+This statement contains three important parts:
+
+```julia
+rng = Xoshiro(2026)
+```
+
+- `Xoshiro` identifies the type of random-number generator being created.
+- `2026` is the seed supplied to its constructor.
+- `rng` is the variable name assigned to the resulting object.
+
+Although `Xoshiro` is a type, `Xoshiro(2026)` resembles a function call because it calls a constructor—a function that creates an object of that type.
+
+The object named `rng` is not a random number. It represents the generator and its current internal state. Each time the generator is used, that state advances to the next point in its sequence.
+
+Julia’s `Xoshiro` is like R's `set.seed()` but with one important distinction. 
+`Xoshiro` creates a particular random-number generator initialized with a seed value (like 2026), so its draws are reproducible when used in the same order. In that sense, it serves the same practical purpose as R's `set.seed()`. But `set.seed()` changes R’s shared, current RNG, while `Xoshiro()` creates a separate RNG object that you pass explicitly
+
+**Check:** The output should resemble:
+
+```text
+Type:      Xoshiro
+Is an RNG: true
+```
+
+The type might also be displayed as `Random.Xoshiro`. The `isa` operator checks whether the object belongs to a particular type or one of its subtypes. `AbstractRNG` is the general Julia type for random-number generators.
+
+### Identify the valid population positions
+
+Before randomly selecting a participant, identify the positions that may be selected.
+
+The syntax needed here is:
+
+```julia
+eachindex(array)
+```
+
+The array is the required argument. The function `eachindex()` returns an iterable representation of the array’s valid indices. It does not select an index randomly.
+
+**Goal:** Examine the positions that are valid for the `adopted` vector.
+
+**Code:** Add this chunk:
+
+````markdown
+```{julia}
+valid_positions = eachindex(adopted)
+
+println("Valid positions: ", valid_positions)
+```
+````
+
+Because `adopted` contains six elements, the result should resemble:
+
+```text
+Valid positions: Base.OneTo(6)
+```
+
+`Base.OneTo(6)` represents the positions from `1` through `6`. Therefore, these expressions are all valid:
+
+```julia
+adopted[1]
+adopted[2]
+adopted[6]
+```
+
+The expression `adopted[7]` would not be valid because the vector has no seventh position.
+
+For an ordinary six-element vector, `eachindex(adopted)` produces the same available positions as `1:6`. Using `eachindex(adopted)` is preferable because the valid positions are derived from the vector itself. If the population changes size, the code does not need a manually updated `1:6`.
+
+Julia’s [`eachindex()` documentation](https://docs.julialang.org/en/v1/base/arrays/#Base.eachindex) describes how the function supplies valid and efficient indices for different kinds of arrays.
+
+### Draw random values
+
+The `rand()` function has several forms. The two needed here are:
+
+```julia
+rand(rng, values)
+rand(rng)
+```
+
+In the first form:
+
+- `rng` identifies the random-number generator to use.
+- `values` identifies the collection of possible values from which one value will be selected.
+
+In the second form, the collection is omitted. Julia then returns one `Float64` value greater than or equal to `0` and less than `1`.
+
+The following expressions therefore ask for different results:
+
+```julia
+rand(rng, valid_positions)  # Select one value from the valid positions
+rand(rng)                   # Generate one Float64 value in [0, 1)
+```
+
+A number supplied directly to `rand()` has a different meaning:
+
+```julia
+rand(rng, 6)
+```
+
+This does not select one integer from `1` through `6`. It requests a vector containing six random floating-point values. To select one integer from that range, use:
+
+```julia
+rand(rng, 1:6)
+```
+
+In this model, `valid_positions` already stored the appropriate range, so we do not need to write `1:6`.
+
+**Goal:** Use the explicit RNG to select two population positions and generate one probability draw.
+
+**Code:** Add this chunk:
+
+````markdown
+```{julia}
+observer = rand(rng, valid_positions)
+model = rand(rng, valid_positions)
+random_draw = rand(rng)
+
+println("Observer index: ", observer)
+println("Model index:    ", model)
+println("Random draw:    ", random_draw)
+```
+````
+
+The two position selections could also have been written in the nested form:
+
+```julia
+observer = rand(rng, eachindex(adopted))
+model = rand(rng, eachindex(adopted))
+```
+
+Julia evaluates the inner call, `eachindex(adopted)`, first. It then supplies the resulting set of valid positions as the second argument to `rand()`.
+
+Separating the operations under the name `valid_positions` makes the two steps easier to see:
+
+```text
+adopted → eachindex() → valid positions → rand() → one selected position
+```
+
+**Check:** Verify the properties of the three results in a separate chunk:
+
+````markdown
+```{julia}
+println("Observer is valid: ", observer in valid_positions)
+println("Model is valid:    ", model in valid_positions)
+println("Draw is valid:     ", 0 <= random_draw < 1)
+```
+````
+
+All three checks should return `true`:
+
+```text
+Observer is valid: true
+Model is valid:    true
+Draw is valid:     true
+```
+
+The operator `in` tests whether a value belongs to a collection. The expression `0 <= random_draw < 1` checks both boundaries of the required interval.
+
+The precise observer, model, and probability values are less important than these properties. Julia’s [Random documentation](https://docs.julialang.org/en/v1/stdlib/Random/) cautions that implementation changes may alter the values produced from a particular seed across Julia versions.
+
+The RNG’s state advances after every call to `rand()`. Therefore:
+
+- Rerunning only the drawing chunk produces the next values in the sequence.
+- Rerunning `rng = Xoshiro(2026)` resets the generator to its seeded starting state.
+- Recreating the RNG and then making the same calls in the same order reproduces the sequence within the same software environment.
+
+Recording both the seed and the project environment provides the appropriate computational context for reproducibility.
+
+For comparison, a common base R workflow would be:
+
+````markdown
+```{r}
+set.seed(2026)
+
+valid_positions <- seq_along(adopted)
+
+observer <- sample(valid_positions, size = 1)
+model <- sample(valid_positions, size = 1)
+random_draw <- runif(1)
+```
+````
+
+The operations correspond as follows:
+
+| Purpose | R | Julia |
+|---|---|---|
+| Initialize randomness | `set.seed(2026)` | `rng = Xoshiro(2026)` |
+| Find valid positions | `seq_along(adopted)` | `eachindex(adopted)` |
+| Select one position | `sample(valid_positions, size = 1)` | `rand(rng, valid_positions)` |
+| Draw a value in $[0,1)$ | `runif(1)` | `rand(rng)` |
+
+The common R pattern changes the state of R’s current random-number generator. This Julia workflow creates a separate RNG object and passes that object to each function that needs randomness.
+
+**Reflect:** Randomness is now a supplied dependency rather than an invisible background setting. The name `rng` refers to a particular generator with its own changing state. This becomes especially useful when different model instances or repeated experiments need separate random streams.
+
+## Repeat interactions with a loop
+
+The previous activities created every operation needed for one interaction:
+
+- `rand()` selects an observer, a model, and a probability value.
+- `will_adopt()` decides whether adoption occurs.
+- `adopt!()` changes the observer’s state when adoption occurs.
+- `sum(adopted)` counts the current adopters.
+
+This section will place those operations inside a loop. No function named `interaction_step!()` is assumed or required. The complete interaction will remain visible inside the loop.
+
+Three different collections are involved:
+
+| Object | What its values represent | Length |
+|---|---|---:|
+| `adopted` | The current states of six participants | Always `6` |
+| `1:practice_steps` | The numbered interaction opportunities | `practice_steps` |
+| `practice_history` | The initial adopter count followed by one count after every interaction | `practice_steps + 1` |
+
+The loop advances through simulated time. It does not iterate through the six participants in order.
+
+### Count interaction opportunities
+
+A [loop]{.glossary-term data-term="Loop"} repeats a block of code. A Julia `for` loop has this form:
+
+```julia
+for loop_variable in values
+    # repeated code
+end
+```
+
+During each repetition, the [loop variable]{.glossary-term data-term="Loop Variable"} receives the next value.
+
+**Goal:** Observe five numbered interaction opportunities before adding the adoption instructions.
+
+**Julia code:** Add this chunk:
+
+````markdown
+```{julia}
+practice_steps = 5
+
+for step in 1:practice_steps
+    println("Interaction opportunity ", step)
+end
+```
+````
+
+The range `1:practice_steps` supplies the values `1`, `2`, `3`, `4`, and `5`. Julia assigns each value to `step` and evaluates the loop body once.
+
+**Check:** The output should list five interaction opportunities:
+
+```text
+Interaction opportunity 1
+Interaction opportunity 2
+Interaction opportunity 3
+Interaction opportunity 4
+Interaction opportunity 5
+```
+
+The value stored in `step` is a time-step number. It is not a position in `adopted`. We know this because the loop header contains `1:practice_steps`, not `adopted` or `eachindex(adopted)`.
+
+If `practice_steps` contained `20`, the loop would run 20 times. The population would still contain six participants.
+
+The [Julia control-flow documentation](https://docs.julialang.org/en/v1/manual/control-flow/) describes how a `for` loop assigns successive values from a range or another iterable object to its loop variable.
+
+**R comparison:** The same counting loop can be written in R:
+
+````markdown
+```{r}
+practice_steps <- 5
+
+for (step in seq_len(practice_steps)) {
+  print(paste("Interaction opportunity", step))
+}
+```
+````
+
+The range expressions differ, but they serve the same purpose:
+
+| Julia | R | Values supplied |
+|---|---|---|
+| `1:practice_steps` | `seq_len(practice_steps)` | `1, 2, 3, 4, 5` |
+
+**Reflect:** `practice_steps` controls how many interactions occur. It does not control the number of participants or guarantee that every participant is selected. Participants will be selected randomly during each interaction.
+
+### Start the population history
+
+The simulation needs to retain the adopter count before any interactions occur. It will then add a new count after every interaction. This ordered record is the simulation’s [history]{.glossary-term data-term="History"}.
+
+**Goal:** Create a known starting population and a history containing its initial adopter count.
+
+**Julia code:** Add this chunk:
+
+````markdown
+```{julia}
+# Reset the population to its initial state.
+adopted = [false, true, false, false, true, false]
+
+# Calculate one number: the current adopter count.
+initial_count = sum(adopted)
+
+# Create a vector containing that initial count.
+practice_history = [initial_count]
+
+println("Initial count: ", initial_count)
+println("History:       ", practice_history)
+```
+````
+
+The output should show:
+
+```text
+Initial count: 2
+History:       [2]
+```
+
+The square brackets have different meanings in these two expressions:
+
+| Expression | Meaning |
+|---|---|
+| `[initial_count]` | Create a vector containing `initial_count` |
+| `adopted[2]` | Retrieve the value at position `2` of `adopted` |
+
+The location of the brackets tells Julia which meaning applies. Here, `practice_history` must be a vector because more counts will be added to it.
+
+**R comparison:** In R, one number is already treated as a vector of length one:
+
+````markdown
+```{r}
+r_adopted <- c(FALSE, TRUE, FALSE, FALSE, TRUE, FALSE)
+
+initial_count <- sum(r_adopted)
+r_practice_history <- initial_count
+
+print(initial_count)
+print(r_practice_history)
+```
+````
+
+Both `practice_history` and `r_practice_history` begin with one value: the initial adopter count of `2`.
+
+**Check:** At this point:
+
+- `adopted` contains six participant states.
+- `practice_history` contains one population-level count.
+- No interactions have occurred.
+
+**Reflect:** The two vectors describe different levels of the model. `adopted` records individual states at the current moment. `practice_history` will record one population summary at several moments.
+
+### Repeat the interaction
+
+One pass through the next loop represents one interaction opportunity:
+
+1. Select an observer.
+2. Select someone for the observer to observe.
+3. Generate a probability draw.
+4. Ask `will_adopt()` whether adoption occurs.
+5. Change the observer’s state when the answer is `true`.
+6. Record the current adopter count.
+
+The population is created before the loop. Therefore, any change made during one step remains in place during the next step.
+
+**Goal:** Perform five random interactions and record the adopter count after each one.
+
+**Julia code:** Add this chunk:
+
+````markdown
+```{julia}
+# Reset the random-number generator.
+rng = Xoshiro(2026)
+
+# Identify the six positions that may be selected.
+valid_positions = eachindex(adopted)
+
+# Use the same probability during every interaction.
+practice_probability = 0.4
+
+for step in 1:practice_steps
+    # Select the two participants in this interaction.
+    observer = rand(rng, valid_positions)
+    model = rand(rng, valid_positions)
+
+    # Generate the probability draw for this interaction.
+    random_draw = rand(rng)
+
+    # Apply the behavioral rule defined earlier.
+    adoption_happens = will_adopt(
+        adopted[observer],
+        adopted[model],
+        random_draw;
+        adoption_probability=practice_probability,
+    )
+
+    # Change the observer's state only when the rule returns true.
+    if adoption_happens
+        adopt!(adopted, observer)
+    end
+
+    # Record the count after this interaction.
+    push!(practice_history, sum(adopted))
+
+    println(
+        "After step ", step,
+        ": ", adopted,
+        " | adopters = ", sum(adopted),
+    )
+end
+```
+````
+
+The lines inside the loop run five times. During each pass, Julia makes new random selections, but it continues using the existing `adopted` vector.
+
+This line:
+
+```julia
+push!(practice_history, sum(adopted))
+```
+
+first calculates the current adopter count and then adds that count to the end of `practice_history`. `push!()` changes the existing vector, following the same mutating-function convention as `adopt!()`. The official [Julia collections documentation](https://docs.julialang.org/en/v1/base/collections/#Base.push!) defines `push!()` as adding one or more items to a collection.
+
+The `push!()` call is outside the `if` block. Consequently, the simulation records a count during every step, including steps when no adoption occurs.
+
+**R comparison:** The equivalent base R loop follows the same sequence:
+
+````markdown
+```{r}
+set.seed(2026)
+
+valid_positions <- seq_along(r_adopted)
+practice_probability <- 0.4
+
+for (step in seq_len(practice_steps)) {
+  # Select the two participants in this interaction.
+  observer <- sample(valid_positions, size = 1)
+  model <- sample(valid_positions, size = 1)
+
+  # Generate the probability draw for this interaction.
+  random_draw <- runif(1)
+
+  # Apply the behavioral rule defined earlier.
+  adoption_happens <- will_adopt(
+    r_adopted[observer],
+    r_adopted[model],
+    random_draw,
+    adoption_probability = practice_probability
+  )
+
+  # Save the returned state when adoption occurs.
+  if (adoption_happens) {
+    r_adopted <- adopt(r_adopted, observer)
+  }
+
+  # Record the count after this interaction.
+  r_practice_history <- c(
+    r_practice_history,
+    sum(r_adopted)
+  )
+
+  print(
+    paste(
+      "After step", step,
+      "| adopters =", sum(r_adopted)
+    )
+  )
+}
+```
+````
+
+>Note that `will_adopt()` was created in the [Combine conditions into a behavioral rule]{#combine-conditions} section. 
+
+The two loops implement the same model. Two state-update lines reflect the languages’ usual workflows:
+
+| Purpose | Julia | R |
+|---|---|---|
+| Change the observer | `adopt!(adopted, observer)` | `r_adopted <- adopt(r_adopted, observer)` |
+| Add a history value | `push!(practice_history, new_count)` | `r_practice_history <- c(r_practice_history, new_count)` |
+
+Julia’s functions mutate the existing vectors. The R functions return extended or updated vectors that are assigned back to their names.
+
+### Check the history
+
+The simulation began with one recorded value and then performed five interactions. Its history should therefore contain six values.
+
+**Julia check:** Add this separate chunk:
+
+````markdown
+```{julia}
+println("History:                 ", practice_history)
+println("Contains six values:     ", length(practice_history) == practice_steps + 1)
+println("Begins with two:         ", first(practice_history) == 2)
+println("Never decreases:         ", issorted(practice_history))
+println("Never exceeds six:       ", maximum(practice_history) <= length(adopted))
+```
+````
+
+The structural checks should all return `true`.
+
+`issorted(practice_history)` checks whether the values are in nondecreasing order. The values may remain level or increase, but they should not decrease because this model permits adoption but not abandonment.
+
+**R check:** The corresponding checks are:
+
+````markdown
+```{r}
+print(r_practice_history)
+length(r_practice_history) == practice_steps + 1
+r_practice_history[1] == 2
+all(diff(r_practice_history) >= 0)
+max(r_practice_history) <= length(r_adopted)
+```
+````
+
+The particular Julia and R histories may differ because their random-number generators do not produce the same sequence. The histories should nevertheless satisfy the same model properties. Julia also cautions that exact seeded sequences may change across software versions, so the [Random documentation](https://docs.julialang.org/en/v1/stdlib/Random/) recommends checking meaningful properties rather than depending on particular random values.
+
+**Reflect:** A repeated count is meaningful. It records an interaction during which the selected participants were not eligible for adoption or the probability draw was too high. The absence of change is still part of the simulated history.
+
+### Package the loop in a function
+
+The practice loop showed how one population changes through several interaction opportunities. We can now place that loop inside a function so that the complete simulation runs with one call.
+
+The function has three keyword arguments:
+
+| Argument | Default | Meaning |
+|---|---:|---|
+| `steps` | `20` | Number of interaction opportunities |
+| `adoption_probability` | `0.4` | Probability of adoption during an eligible interaction |
+| `seed` | `2026` | Seed used to initialize the random-number generator |
+
+A default is used when the caller does not supply a replacement.
+
+**Goal:** Create a function that starts a fresh population, repeats the adoption process, and returns the adopter history.
+
+**Julia code:** Add this chunk:
+
+````markdown
+```{julia}
+using Random
+
+function run_simulation(;
+    steps=20,
+    adoption_probability=0.4,
+    seed=2026,
+)
+    # Create the initial population.
+    adopted = [false, true, false, false, true, false]
+
+    # Create the random-number generator.
+    rng = Xoshiro(seed)
+    valid_positions = eachindex(adopted)
+
+    # Record the initial number of adopters.
+    adopter_history = [sum(adopted)]
+
+    for step in 1:steps
+        # Select an observer and a model.
+        observer = rand(rng, valid_positions)
+        model = rand(rng, valid_positions)
+
+        # Generate a probability draw.
+        random_draw = rand(rng)
+
+        # Adoption can occur only when:
+        # 1. the observer has not adopted,
+        # 2. the model has adopted, and
+        # 3. the random draw is below the adoption probability.
+        if !adopted[observer] &&
+           adopted[model] &&
+           random_draw < adoption_probability
+            adopted[observer] = true
+        end
+
+        # Record the adopter count after every interaction.
+        push!(adopter_history, sum(adopted))
+    end
+
+    return adopter_history
+end
+```
+````
+
+The function contains the same mechanism as the practice loop. It creates a fresh population and random-number generator each time it runs.
+
+The adoption condition is written directly inside the function so that the complete rule remains visible. No additional custom functions are required.
+
+**Julia code:** Run one simulation using the defaults:
+
+````markdown
+```{julia}
+history = run_simulation()
+
+println("Adopter history: ", history)
+```
+````
+
+Calling `run_simulation()` without arguments uses:
+
+- `20` interaction opportunities,
+- an adoption probability of `0.4`, and
+- a seed of `2026`.
+
+The returned vector is saved outside the function under the name `history`.
+
+**Check:** Examine the structure of the result:
+
+````markdown
+```{julia}
+println("Contains 21 values: ", length(history) == 21)
+println("Begins with two:    ", first(history) == 2)
+println("Never decreases:    ", issorted(history))
+println("Never exceeds six:  ", maximum(history) <= 6)
+```
+````
+
+These checks should all return `true`.
+
+The history contains `21` values because it records:
+
+- one count before any interactions occur, and
+- one count after each of the `20` interactions.
+
+A repeated count does not indicate an error. It means that an interaction occurred without producing a new adopter.
+
+**R comparison:** Packaging a workflow inside a function serves the same purpose in Julia and R.
+
+| Purpose | Julia | R |
+|---|---|---|
+| Define a function | `function run_simulation(...)` | `run_simulation <- function(...)` |
+| End the function | `end` | `}` |
+| Set defaults | `steps=20` | `steps = 20` |
+| Return the history | `return(adopter_history)` | `return(adopter_history)` |
+
+The complete R function is not repeated here because the interaction loop has already been compared across the two languages. In both languages, the function packages an understood sequence of operations into a reusable unit.
+
+**Reflect:** This function repeats interactions within one evolving simulation. Each step uses the population produced by the previous step. This differs from R’s `replicate()`, which is commonly used to repeat an entire experiment independently. Repeating complete simulation runs will be introduced later.
+
+## Compare controlled changes
+
+The simulation is [stochastic]{.glossary-term data-term="Stochastic"} because its history depends partly on random selections and probability draws. One run represents one possible history.
+
+We can still test whether the programmed rule behaves coherently at its boundaries.
+
+**Goal:** Hold the number of steps and seed constant while comparing the lowest and highest possible adoption probabilities.
+
+**Julia code:** Add this chunk:
+
+````markdown
+```{julia}
+no_adoption = run_simulation(
+    steps=30,
+    adoption_probability=0.0,
+    seed=2026,
+)
+
+adopt_when_eligible = run_simulation(
+    steps=30,
+    adoption_probability=1.0,
+    seed=2026,
+)
+
+println(
+    "Final count when probability = 0.0: ",
+    last(no_adoption),
+)
+
+println(
+    "Final count when probability = 1.0: ",
+    last(adopt_when_eligible),
+)
+```
+````
+
+Before running the code, predict what must happen when the adoption probability is `0.0`.
+
+**Check:** Test the two histories:
+
+````markdown
+```{julia}
+println(
+    "No adoption occurs at 0.0: ",
+    all(count -> count == 2, no_adoption),
+)
+
+println(
+    "The 1.0 history never decreases: ",
+    issorted(adopt_when_eligible),
+)
+
+println(
+    "The final count remains valid: ",
+    last(adopt_when_eligible) <= 6,
+)
+```
+````
+
+These checks should return `true`.
+
+When the probability is `0.0`, the condition
+
+```julia
+random_draw < adoption_probability
+```
+
+cannot be satisfied. The population therefore remains at its initial count of two adopters.
+
+When the probability is `1.0`, every eligible interaction produces adoption. An interaction is eligible only when a non-adopter observes an adopter, so some steps may still produce no change.
+
+**Reflect:** This comparison tests the boundaries of the programmed rule. It does not tell us what normally happens at different probabilities. Estimating typical outcomes would require repeating the entire simulation many times, which belongs in a later simulation-experiments chapter.
+
+## Read the completed simulation as a model
+
+The completed program connects a small number of model components:
+
+| Model component | Julia representation | Meaning |
+|---|---|---|
+| State | `adopted` | Records whether each of six participants has adopted. |
+| Interaction | `observer` and `model` | Identifies who observes whom during one step. |
+| Behavioral rule | The three-part `if` condition | Determines whether adoption occurs. |
+| State change | `adopted[observer] = true` | Changes a non-adopter into an adopter. |
+| Time | `for step in 1:steps` | Treats each interaction opportunity as one time step. |
+| Output | `adopter_history` | Records the initial count and the count after every step. |
+
+The model also makes several simplifying assumptions:
+
+- Everyone has the same adoption probability.
+- Adoption can occur, but abandonment cannot.
+- Participants interact randomly rather than through a social network.
+- Only one observer-model interaction occurs during each time step.
+- The recorded history contains adopter counts rather than individual identities.
+
+These assumptions are not programming mistakes. They define the system represented by the current model.
+
+**Reflect:** Ordinary Julia vectors, conditions, loops, and functions are sufficient to express a small agent-like model. Agents.jl will later provide additional structures for organizing agents, model properties, scheduling, model steps, and data collection. The basic pieces developed here will remain recognizable.
+
+## Summary
+
+The central lesson of this chapter is that a simulation connects a **state** to rules that determine who interacts, what happens during an interaction, how the state changes, how time advances, and what the model records. We began with six Boolean values that described a population at one moment. By the end of the chapter, those values could change through repeated interactions and produce a history of adoption over time.
+
+The completed simulation contains these connected parts:
+
+| Model component | What we implemented | Review the explanation |
+|---|---|---|
+| **State** | `adopted` records whether each participant has adopted the practice. | [Represent the population state](#represent-the-population-state) |
+| **Activation rule** | Random selection of `observer` and `model` determines who receives an opportunity to observe whom. | [Draw random values](#draw-random-values) |
+| **Chance process** | `random_draw` and `adoption_probability` represent uncertainty in whether an eligible interaction produces adoption. | [Chance](#chance) |
+| **Behavioral rule** | Adoption requires a non-adopter to observe an adopter and receive a sufficiently low random draw. | [Combine conditions into a behavioral rule](#combine-conditions) |
+| **State change** | The selected observer’s value changes from `false` to `true` when adoption occurs. | [Change state with a mutating function](#change-state-with-a-mutating-function) |
+| **Time step** | Each pass through the `for` loop represents one interaction opportunity. The population produced by one step becomes the starting state for the next. | [Repeat interactions with a loop](#repeat-interactions-with-a-loop) |
+| **Output** | The history vector records the initial adopter count and one count after every time step. | [Start the population history](#start-the-population-history) and [Check the history](#check-the-history) |
+
+We then [packaged the loop in a function](#package-the-loop-in-a-function), allowing the complete simulation to run from a fresh population with specified numbers of steps, adoption probabilities, and random seeds. Finally, we [compared controlled changes](#compare-controlled-changes) at probabilities `0.0` and `1.0` to check whether the programmed behavioral rule responded coherently at its boundaries.
+
+The broader learning outcome is that Julia functions, conditionals, Boolean operators, random draws, mutation, and loops are not isolated programming techniques. Together, they translate a verbal account of a social process into an explicit computational model. Every claim about the model—who can interact, when adoption occurs, what changes, what counts as time, and what is observed—should correspond to identifiable code. The section [Read the completed simulation as a model](#read-the-completed-simulation-as-a-model) brings those relationships together and identifies the assumptions that limit what this particular model represents.
+
+Next, the agents based modeling module will provide structures for organizing these components. The key takeaway here is that the underlying model requires a state, activation rule, behavioral rule, state transition, representation of time, and recorded output.
+
+## Chapter terms {#chapter-terms}
+
+**Activation Rule**: A rule that determines which entity or entities receive an opportunity to act or interact during a model step.
+
+**Array**: An ordered, mutable collection of elements arranged in one or more dimensions. In Julia, a `Vector` is a one-dimensional array.
+
+**Behavioral Rule**: An executable statement of how an entity responds under specified conditions.
+
+**Boolean Operator**: An operator such as `!`, `&&`, or `||` that reverses or combines Boolean values.
+
+**Conditional**: A control-flow structure that selects which code to evaluate based on whether one or more conditions are true or false.
+
+**Function Call**: The act of invoking a function by specifying its name and providing the required arguments. An expression that runs a function by writing its name followed by parentheses containing any values supplied to it.
+
+**Function Body**: The expression or block of expressions evaluated when a function is called.
+
+**Function Definition**: Code that specifies a function's name, arguments, and behavior.
+
+**History:** An ordered record of selected model values across time. In this simulation, the history contains the initial adopter count followed by one count after every time step.
+
+**Iterable:** An object that can supply a sequence of values one at a time, allowing a loop to evaluate its body once for each value.
+
+**Keyword Argument**: A function input supplied by name, often with a default value and separated from positional arguments by a semicolon.
+
+**Loop**: A control-flow structure that repeats a block of code.
+
+**Loop Variable:** A temporary name assigned to each successive value supplied by a loop’s iterable.
+
+**Macro**: A Julia construct invoked with `@` that transforms or generates code before the resulting expression is evaluated. `@show` is a macro used to display an expression and its value.
+
+**Mutating Function**: A function that changes an existing mutable object. Julia conventionally marks such a function with `!` at the end of its name.
+
+**Mutation**: A change made to an existing mutable object, such as replacing one element of an array.
+
+**Positional Argument**: A function input matched to a parameter according to its position in the call.
+
+**Random-Number Generator (RNG)**: An object that produces a pseudorandom sequence used to represent chance in a computation.
+
+**Range**: A compact representation of an ordered sequence of values, such as `2:4`.
+
+**Return Value**: The value produced by a function call. Julia returns the final evaluated expression unless execution reaches an explicit `return`.
+
+**Seed**: A value used to initialize a pseudorandom number generator so that a random sequence can be reproduced within a defined computational environment.
+
+**State**: The set of values that describes a system at a particular moment.
+
+**Stochastic**: Involving chance, so that repeated runs may produce different trajectories or outcomes.
+
+**Time Step**: One unit of simulated progression. In this chapter, one time step contains one randomly selected interaction.
+
